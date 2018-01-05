@@ -1,4 +1,4 @@
-# terraform-provider-mongodbatlas
+# terraform-provider-mongodbatlas [![Build Status](https://travis-ci.org/akshaykarle/terraform-provider-mongodbatlas.svg?branch=master)](https://travis-ci.org/akshaykarle/terraform-provider-mongodbatlas)
 Terraform provider for [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
 
 ## Requirements
