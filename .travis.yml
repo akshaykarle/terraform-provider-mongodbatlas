@@ -1,0 +1,7 @@
+dist: trusty
+sudo: false
+language: go
+
+script:
+- make test
+- make vet
