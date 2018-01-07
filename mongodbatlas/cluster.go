@@ -3,8 +3,10 @@ package mongodbatlas
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/akshaykarle/mongodb-atlas-go/mongodb"
+	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -103,6 +105,23 @@ func resourceClusterCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetId(cluster.ID)
 	log.Printf("[INFO] MongoDB Cluster ID: %s", d.Id())
 
+	log.Println("[INFO] Waiting for MongoDB Cluster to be available")
+
+	stateConf := &resource.StateChangeConf{
+		Pending:    []string{"CREATING", "UPDATING", "REPAIRING"},
+		Target:     []string{"IDLE"},
+		Refresh:    resourceClusterStateRefreshFunc(d.Get("name").(string), d.Get("group").(string), client),
+		Timeout:    d.Timeout(schema.TimeoutDelete),
+		MinTimeout: 10 * time.Second,
+		Delay:      30 * time.Second, // Wait 30 secs before starting
+	}
+
+	// Wait, catching any errors
+	_, err = stateConf.WaitForState()
+	if err != nil {
+		return err
+	}
+
 	return resourceClusterRead(d, meta)
 }
 
@@ -143,5 +162,42 @@ func resourceClusterDelete(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error destroying MongoDB Cluster %s: %s", d.Get("name").(string), err)
 	}
 
+	log.Println("[INFO] Waiting for MongoDB Cluster to be destroyed")
+
+	stateConf := &resource.StateChangeConf{
+		Pending:    []string{"IDLE", "CREATING", "UPDATING", "REPAIRING", "DELETING"},
+		Target:     []string{"", "DELETED"},
+		Refresh:    resourceClusterStateRefreshFunc(d.Get("name").(string), d.Get("group").(string), client),
+		Timeout:    d.Timeout(schema.TimeoutCreate),
+		MinTimeout: 10 * time.Second,
+		Delay:      30 * time.Second, // Wait 30 secs before starting
+	}
+
+	// Wait, catching any errors
+	_, err = stateConf.WaitForState()
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func resourceClusterStateRefreshFunc(name, group string, client *mongodb.Client) resource.StateRefreshFunc {
+	return func() (interface{}, string, error) {
+		c, _, err := client.Clusters.Get(group, name)
+		if err != nil {
+			log.Printf("Error reading MongoDB Cluster %s: %s", name, err)
+			return nil, "", err
+		}
+
+		if c == nil {
+			return nil, "", nil
+		}
+
+		if c.StateName != "" {
+			log.Printf("[DEBUG] MongoDB Cluster status for cluster: %s: %s", name, c.StateName)
+		}
+
+		return c, c.StateName, nil
+	}
 }
