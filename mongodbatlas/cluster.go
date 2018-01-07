@@ -108,6 +108,7 @@ func resourceClusterCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceClusterRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*mongodb.Client)
+
 	c, _, err := client.Clusters.Get(d.Get("group").(string), d.Get("name").(string))
 	if err != nil {
 		return fmt.Errorf("Error reading MongoDB Cluster %s: %s", d.Get("name").(string), err)
@@ -134,5 +135,13 @@ func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceClusterDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*mongodb.Client)
+
+	log.Printf("[DEBUG] MongoDB Cluster destroy: %v", d.Id())
+	_, err := client.Clusters.Delete(d.Get("group").(string), d.Get("name").(string))
+	if err != nil {
+		return fmt.Errorf("Error destroying MongoDB Cluster %s: %s", d.Get("name").(string), err)
+	}
+
 	return nil
 }
