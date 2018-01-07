@@ -60,10 +60,12 @@ func resourceCluster() *schema.Resource {
 			"disk_size_gb": &schema.Schema{
 				Type:     schema.TypeFloat,
 				Optional: true,
+				Default:  2,
 			},
 			"replication_factor": &schema.Schema{
 				Type:     schema.TypeInt,
 				Optional: true,
+				Default:  3,
 			},
 			"identifier": &schema.Schema{
 				Type:     schema.TypeString,
@@ -172,6 +174,9 @@ func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if requestUpdate {
+		// Set read-only fields to an empty string to make the API happy
+		c.StateName = ""
+		c.MongoDBVersion = ""
 		_, _, err := client.Clusters.Update(d.Get("group").(string), d.Get("name").(string), c)
 		if err != nil {
 			return fmt.Errorf("Error reading MongoDB Cluster %s: %s", d.Get("name").(string), err)
