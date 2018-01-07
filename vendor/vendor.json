@@ -10,6 +10,18 @@
 			"revisionTime": "2018-01-04T23:04:35Z"
 		},
 		{
+			"checksumSHA1": "dRbtalKtCuOx1905fbvb0WwE8Gc=",
+			"path": "github.com/akshaykarle/go-http-digest-auth-client",
+			"revision": "e991a929247d9f8263227e39d5e395c85674811a",
+			"revisionTime": "2018-01-04T19:21:51Z"
+		},
+		{
+			"checksumSHA1": "ipm34g/7CfgYPiEu1cvnyczWITM=",
+			"path": "github.com/akshaykarle/mongodb-atlas-go/mongodb",
+			"revision": "0d0dd5bab343648c6ac60eb784b96fe7a9f94fb6",
+			"revisionTime": "2018-01-05T01:26:47Z"
+		},
+		{
 			"checksumSHA1": "7eAIWei337IlBYIfzA3HyOEV9WE=",
 			"origin": "github.com/hashicorp/terraform/vendor/github.com/apparentlymart/go-cidr/cidr",
 			"path": "github.com/apparentlymart/go-cidr/cidr",
@@ -227,6 +239,12 @@
 			"revisionTime": "2018-01-04T23:04:35Z"
 		},
 		{
+			"checksumSHA1": "LrOnRW6KCAcKDnKPs+Hibtb7Duk=",
+			"path": "github.com/dghubble/sling",
+			"revision": "80ec33c6152a53edb5545864ca37567b506c4ca5",
+			"revisionTime": "2017-06-29T03:54:44Z"
+		},
+		{
 			"checksumSHA1": "1K+xrZ1PBez190iGt5OnMtGdih4=",
 			"origin": "github.com/hashicorp/terraform/vendor/github.com/go-ini/ini",
 			"path": "github.com/go-ini/ini",
@@ -267,6 +285,12 @@
 			"path": "github.com/golang/protobuf/ptypes/timestamp",
 			"revision": "18975d72704796def799bdae053c8c9ae6f5c92c",
 			"revisionTime": "2018-01-04T23:04:35Z"
+		},
+		{
+			"checksumSHA1": "p3IB18uJRs4dL2K5yx24MrLYE9A=",
+			"path": "github.com/google/go-querystring/query",
+			"revision": "53e6ce116135b80d037921a7fdd5138cf32d7a8a",
+			"revisionTime": "2017-01-11T10:11:55Z"
 		},
 		{
 			"checksumSHA1": "cdOCt0Yb+hdErz8NAQqayxPmRsY=",
