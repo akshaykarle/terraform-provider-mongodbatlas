@@ -166,7 +166,7 @@ func resourceClusterDelete(d *schema.ResourceData, meta interface{}) error {
 
 	stateConf := &resource.StateChangeConf{
 		Pending:    []string{"IDLE", "CREATING", "UPDATING", "REPAIRING", "DELETING"},
-		Target:     []string{"", "DELETED"},
+		Target:     []string{"DELETED"},
 		Refresh:    resourceClusterStateRefreshFunc(d.Get("name").(string), d.Get("group").(string), client),
 		Timeout:    d.Timeout(schema.TimeoutCreate),
 		MinTimeout: 10 * time.Second,
@@ -184,14 +184,13 @@ func resourceClusterDelete(d *schema.ResourceData, meta interface{}) error {
 
 func resourceClusterStateRefreshFunc(name, group string, client *mongodb.Client) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
-		c, _, err := client.Clusters.Get(group, name)
+		c, resp, err := client.Clusters.Get(group, name)
 		if err != nil {
+			if resp.StatusCode == 404 {
+				return 42, "DELETED", nil
+			}
 			log.Printf("Error reading MongoDB Cluster %s: %s", name, err)
 			return nil, "", err
-		}
-
-		if c == nil {
-			return nil, "", nil
 		}
 
 		if c.StateName != "" {
