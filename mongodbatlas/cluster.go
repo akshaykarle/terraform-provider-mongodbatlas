@@ -150,7 +150,51 @@ func resourceClusterRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
-	return nil
+	client := meta.(*mongodb.Client)
+	requestUpdate := false
+
+	c, _, err := client.Clusters.Get(d.Get("group").(string), d.Get("name").(string))
+	if err != nil {
+		return fmt.Errorf("Error reading MongoDB Cluster %s: %s", d.Get("name").(string), err)
+	}
+
+	if d.HasChange("backup") {
+		c.BackupEnabled = d.Get("backup").(bool)
+		requestUpdate = true
+	}
+	if d.HasChange("disk_size_gb") {
+		c.DiskSizeGB = d.Get("disk_size_gb").(float64)
+		requestUpdate = true
+	}
+	if d.HasChange("replication_factor") {
+		c.ReplicationFactor = d.Get("replication_factor").(int)
+		requestUpdate = true
+	}
+
+	if requestUpdate {
+		_, _, err := client.Clusters.Update(d.Get("group").(string), d.Get("name").(string), c)
+		if err != nil {
+			return fmt.Errorf("Error reading MongoDB Cluster %s: %s", d.Get("name").(string), err)
+		}
+
+		log.Println("[INFO] Waiting for MongoDB Cluster to be updated")
+
+		stateConf := &resource.StateChangeConf{
+			Pending:    []string{"CREATING", "UPDATING", "REPAIRING"},
+			Target:     []string{"IDLE"},
+			Refresh:    resourceClusterStateRefreshFunc(d.Get("name").(string), d.Get("group").(string), client),
+			Timeout:    d.Timeout(schema.TimeoutUpdate),
+			MinTimeout: 10 * time.Second,
+			Delay:      30 * time.Second, // Wait 30 secs before starting
+		}
+
+		// Wait, catching any errors
+		_, err = stateConf.WaitForState()
+		if err != nil {
+			return err
+		}
+	}
+	return resourceClusterRead(d, meta)
 }
 
 func resourceClusterDelete(d *schema.ResourceData, meta interface{}) error {
