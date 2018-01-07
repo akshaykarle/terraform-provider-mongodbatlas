@@ -15,6 +15,6 @@ resource "mongodbatlas_cluster" "test" {
   mongodb_major_version = "3.4"
   provider_name = "AWS"
   region = "US_EAST_1"
-  size = "M0"
+  size = "M10"
   backup = false
 }
