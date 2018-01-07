@@ -22,6 +22,7 @@ resource "mongodbatlas_cluster" "test" {
   # ...
 }
 ```
+Also look at the example under [/examples](/examples).
 
 ## Building the Provider
 Clone repository to: `$GOPATH/src/github.com/akshaykarle/terraform-provider-mongodbatlas`
