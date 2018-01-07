@@ -17,4 +17,5 @@ resource "mongodbatlas_cluster" "test" {
   region = "US_EAST_1"
   size = "M10"
   backup = false
+  disk_size_gb = 4.5
 }
