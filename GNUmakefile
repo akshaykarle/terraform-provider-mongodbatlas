@@ -6,6 +6,9 @@ default: build
 build: fmtcheck
 	go install
 
+build-linux: fmtcheck
+	env GOOS=linux GOARCH=amd64 go build
+
 test: fmtcheck
 	go test -i $(TEST) || exit 1
 	echo $(TEST) | \
