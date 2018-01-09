@@ -111,5 +111,13 @@ func resourcePeerUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourcePeerDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*mongodb.Client)
+
+	log.Printf("[DEBUG] MongoDB VPC Peering connection destroy: %v", d.Id())
+	_, err := client.Peers.Delete(d.Get("group").(string), d.Id())
+	if err != nil {
+		return fmt.Errorf("Error destroying MongoDB VPC Peering connection %s: %s", d.Id(), err)
+	}
+
 	return nil
 }
