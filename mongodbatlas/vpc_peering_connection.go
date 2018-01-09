@@ -10,12 +10,12 @@ import (
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
-func resourcePeer() *schema.Resource {
+func resourceVpcPeeringConnection() *schema.Resource {
 	return &schema.Resource{
-		Create: resourcePeerCreate,
-		Read:   resourcePeerRead,
-		Update: resourcePeerUpdate,
-		Delete: resourcePeerDelete,
+		Create: resourceVpcPeeringConnectionCreate,
+		Read:   resourceVpcPeeringConnectionRead,
+		Update: resourceVpcPeeringConnectionUpdate,
+		Delete: resourceVpcPeeringConnectionDelete,
 
 		Schema: map[string]*schema.Schema{
 			"group": &schema.Schema{
@@ -68,7 +68,7 @@ func resourcePeer() *schema.Resource {
 	}
 }
 
-func resourcePeerCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceVpcPeeringConnectionCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*mongodb.Client)
 
 	params := mongodb.Peer{
@@ -90,7 +90,7 @@ func resourcePeerCreate(d *schema.ResourceData, meta interface{}) error {
 	stateConf := &resource.StateChangeConf{
 		Pending:    []string{"INITIATING", "FINALIZING"},
 		Target:     []string{"AVAILABLE", "PENDING_ACCEPTANCE"},
-		Refresh:    resourcePeerStateRefreshFunc(d.Id(), d.Get("group").(string), client),
+		Refresh:    resourceVpcPeeringConnectionStateRefreshFunc(d.Id(), d.Get("group").(string), client),
 		Timeout:    d.Timeout(schema.TimeoutCreate),
 		MinTimeout: 10 * time.Second,
 		Delay:      30 * time.Second, // Wait 30 secs before starting
@@ -102,10 +102,10 @@ func resourcePeerCreate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	return resourcePeerRead(d, meta)
+	return resourceVpcPeeringConnectionRead(d, meta)
 }
 
-func resourcePeerRead(d *schema.ResourceData, meta interface{}) error {
+func resourceVpcPeeringConnectionRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*mongodb.Client)
 
 	p, _, err := client.Peers.Get(d.Get("group").(string), d.Id())
@@ -125,11 +125,11 @@ func resourcePeerRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourcePeerUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceVpcPeeringConnectionUpdate(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourcePeerDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceVpcPeeringConnectionDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*mongodb.Client)
 
 	log.Printf("[DEBUG] MongoDB VPC Peering connection destroy: %v", d.Id())
@@ -143,7 +143,7 @@ func resourcePeerDelete(d *schema.ResourceData, meta interface{}) error {
 	stateConf := &resource.StateChangeConf{
 		Pending:    []string{"AVAILABLE", "PENDING_ACCEPTANCE", "INITIATING", "FINALIZING", "TERMINATING"},
 		Target:     []string{"DELETED"},
-		Refresh:    resourcePeerStateRefreshFunc(d.Id(), d.Get("group").(string), client),
+		Refresh:    resourceVpcPeeringConnectionStateRefreshFunc(d.Id(), d.Get("group").(string), client),
 		Timeout:    d.Timeout(schema.TimeoutDelete),
 		MinTimeout: 10 * time.Second,
 		Delay:      30 * time.Second, // Wait 30 secs before starting
@@ -158,7 +158,7 @@ func resourcePeerDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourcePeerStateRefreshFunc(id, group string, client *mongodb.Client) resource.StateRefreshFunc {
+func resourceVpcPeeringConnectionStateRefreshFunc(id, group string, client *mongodb.Client) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
 		p, resp, err := client.Peers.Get(group, id)
 		if err != nil {

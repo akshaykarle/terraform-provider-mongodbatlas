@@ -20,7 +20,7 @@ resource "mongodbatlas_container" "test" {
 }
 
 # Initiate a Peering connection
-resource "mongodbatlas_peer" "test" {
+resource "mongodbatlas_vpc_peering_connection" "test" {
   group = "${var.mongodb_atlas_group_id}"
   aws_account_id = "${var.aws_account_id}"
   vpc_id = "${var.vpc_id}"
