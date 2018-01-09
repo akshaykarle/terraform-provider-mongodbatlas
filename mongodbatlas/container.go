@@ -57,6 +57,7 @@ func resourceContainer() *schema.Resource {
 
 func resourceContainerCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*mongodb.Client)
+
 	params := mongodb.Container{
 		AtlasCidrBlock: d.Get("atlas_cidr_block").(string),
 		ProviderName:   d.Get("provider_name").(string),
@@ -65,7 +66,7 @@ func resourceContainerCreate(d *schema.ResourceData, meta interface{}) error {
 
 	container, _, err := client.Containers.Create(d.Get("group").(string), &params)
 	if err != nil {
-		return fmt.Errorf("Error creating MongoDB Cluster: %s", err)
+		return fmt.Errorf("Error creating MongoDB Container: %s", err)
 	}
 	d.SetId(container.ID)
 	log.Printf("[INFO] MongoDB Container ID: %s", d.Id())
