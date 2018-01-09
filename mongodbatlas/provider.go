@@ -25,6 +25,7 @@ func Provider() terraform.ResourceProvider {
 		ResourcesMap: map[string]*schema.Resource{
 			"mongodbatlas_cluster":   resourceCluster(),
 			"mongodbatlas_container": resourceContainer(),
+			"mongodbatlas_peer":      resourcePeer(),
 		},
 
 		ConfigureFunc: providerConfigure,

@@ -1,6 +1,9 @@
 variable "mongodb_atlas_username" {}
 variable "mongodb_atlas_api_key" {}
 variable "mongodb_atlas_group_id" {}
+variable "aws_account_id" {}
+variable "vpc_id" {}
+variable "vpc_cidr_block" { default = "10.1.0.0/16" }
 
 # Configure the MongoDB Atlas Provider
 provider "mongodbatlas" {
@@ -14,6 +17,15 @@ resource "mongodbatlas_container" "test" {
   atlas_cidr_block = "10.0.0.0/21"
   provider_name = "AWS"
   region = "US_EAST_1"
+}
+
+# Initiate a Peering connection
+resource "mongodbatlas_peer" "test" {
+  group = "${var.mongodb_atlas_group_id}"
+  aws_account_id = "${var.aws_account_id}"
+  vpc_id = "${var.vpc_id}"
+  route_table_cidr_block = "${var.vpc_cidr_block}"
+  container_id = "${mongodbatlas_container.test.id}"
 }
 
 # Create a Cluster
