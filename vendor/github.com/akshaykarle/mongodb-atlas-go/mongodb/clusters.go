@@ -19,6 +19,11 @@ func newClusterService(sling *sling.Sling) *ClusterService {
 	}
 }
 
+// AutoScaling has the information on whether disk auto-scaling is enabled.
+type AutoScaling struct {
+	DiskGBEnabled bool `json:"diskGBEnabled"`
+}
+
 // ProviderSettings is the configuration for the provisioned servers on which MongoDB runs.
 // The available options are specific to the cloud service provider.
 type ProviderSettings struct {
@@ -34,11 +39,17 @@ type Cluster struct {
 	GroupID             string           `json:"groupId,omitempty"`
 	Name                string           `json:"name,omitempty"`
 	MongoDBVersion      string           `json:"mongoDBVersion,omitempty"`
-	DiskSizeGB          float64          `json:"diskSizeGB,omitempty"`
 	MongoDBMajorVersion string           `json:"mongoDBMajorVersion,omitempty"`
+	MongoURI            string           `json:"mongoURI,omitempty"`
+	MongoURIUpdated     string           `json:"mongoURIUpdated,omitempty"`
+	MongoURIWithOptions string           `json:"mongoURIWithOptions,omitempty"`
+	DiskSizeGB          float64          `json:"diskSizeGB,omitempty"`
 	BackupEnabled       bool             `json:"backupEnabled"`
 	StateName           string           `json:"stateName,omitempty"`
 	ReplicationFactor   int              `json:"replicationFactor,omitempty"`
+	NumShards           int              `json:"numShards,omitempty"`
+	Paused              bool             `json:"paused"`
+	AutoScaling         AutoScaling      `json:"autoScaling,omitempty"`
 	ProviderSettings    ProviderSettings `json:"providerSettings,omitempty"`
 }
 
