@@ -3,8 +3,10 @@ package mongodbatlas
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/akshaykarle/mongodb-atlas-go/mongodb"
+	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -83,6 +85,23 @@ func resourcePeerCreate(d *schema.ResourceData, meta interface{}) error {
 	d.SetId(peer.ID)
 	log.Printf("[INFO] MongoDB Peering ID: %s", d.Id())
 
+	log.Println("[INFO] Waiting for MongoDB VPC Peering Connection to be available")
+
+	stateConf := &resource.StateChangeConf{
+		Pending:    []string{"INITIATING", "FINALIZING"},
+		Target:     []string{"AVAILABLE", "PENDING_ACCEPTANCE"},
+		Refresh:    resourcePeerStateRefreshFunc(d.Id(), d.Get("group").(string), client),
+		Timeout:    d.Timeout(schema.TimeoutCreate),
+		MinTimeout: 10 * time.Second,
+		Delay:      30 * time.Second, // Wait 30 secs before starting
+	}
+
+	// Wait, catching any errors
+	_, err = stateConf.WaitForState()
+	if err != nil {
+		return err
+	}
+
 	return resourcePeerRead(d, meta)
 }
 
@@ -119,5 +138,41 @@ func resourcePeerDelete(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error destroying MongoDB VPC Peering connection %s: %s", d.Id(), err)
 	}
 
+	log.Println("[INFO] Waiting for MongoDB VPC Peering Connection to be destroyed")
+
+	stateConf := &resource.StateChangeConf{
+		Pending:    []string{"AVAILABLE", "PENDING_ACCEPTANCE", "INITIATING", "FINALIZING", "TERMINATING"},
+		Target:     []string{"DELETED"},
+		Refresh:    resourcePeerStateRefreshFunc(d.Id(), d.Get("group").(string), client),
+		Timeout:    d.Timeout(schema.TimeoutDelete),
+		MinTimeout: 10 * time.Second,
+		Delay:      30 * time.Second, // Wait 30 secs before starting
+	}
+
+	// Wait, catching any errors
+	_, err = stateConf.WaitForState()
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func resourcePeerStateRefreshFunc(id, group string, client *mongodb.Client) resource.StateRefreshFunc {
+	return func() (interface{}, string, error) {
+		p, resp, err := client.Peers.Get(group, id)
+		if err != nil {
+			if resp.StatusCode == 404 {
+				return 42, "DELETED", nil
+			}
+			log.Printf("Error reading MongoDB VPC Peering connection %s: %s", id, err)
+			return nil, "", err
+		}
+
+		if p.StatusName != "" {
+			log.Printf("[DEBUG] MongoDB Peer status for cluster: %s: %s", id, p.StatusName)
+		}
+
+		return p, p.StatusName, nil
+	}
 }
