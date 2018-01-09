@@ -67,6 +67,21 @@ func resourceCluster() *schema.Resource {
 				Optional: true,
 				Default:  3,
 			},
+			"num_shards": &schema.Schema{
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  1,
+			},
+			"paused": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"disk_gb_enabled": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  true,
+			},
 			"identifier": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -74,6 +89,26 @@ func resourceCluster() *schema.Resource {
 				Computed: true,
 			},
 			"state": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"mongodb_version": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"mongo_uri": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"mongo_uri_updated": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"mongo_uri_with_options": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -91,6 +126,9 @@ func resourceClusterCreate(d *schema.ResourceData, meta interface{}) error {
 		RegionName:          d.Get("region").(string),
 		InstanceSizeName:    d.Get("size").(string),
 	}
+	autoScaling := mongodb.AutoScaling{
+		DiskGBEnabled: d.Get("disk_gb_enabled").(bool),
+	}
 	params := mongodb.Cluster{
 		Name:                d.Get("name").(string),
 		MongoDBMajorVersion: d.Get("mongodb_major_version").(string),
@@ -98,6 +136,9 @@ func resourceClusterCreate(d *schema.ResourceData, meta interface{}) error {
 		BackupEnabled:       d.Get("backup").(bool),
 		ReplicationFactor:   d.Get("replication_factor").(int),
 		DiskSizeGB:          d.Get("disk_size_gb").(float64),
+		NumShards:           d.Get("num_shards").(int),
+		Paused:              d.Get("paused").(bool),
+		AutoScaling:         autoScaling,
 	}
 
 	cluster, _, err := client.Clusters.Create(d.Get("group").(string), &params)
@@ -144,9 +185,16 @@ func resourceClusterRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("backing_provider", c.ProviderSettings.BackingProviderName)
 	d.Set("region", c.ProviderSettings.RegionName)
 	d.Set("disk_size_gb", c.DiskSizeGB)
+	d.Set("disk_gb_enabled", c.AutoScaling.DiskGBEnabled)
 	d.Set("replication_factor", c.ReplicationFactor)
 	d.Set("identifier", c.ID)
 	d.Set("state", c.StateName)
+	d.Set("num_shards", c.NumShards)
+	d.Set("paused", c.Paused)
+	d.Set("mongodb_version", c.MongoDBVersion)
+	d.Set("mongo_uri", c.MongoURI)
+	d.Set("mongo_uri_updated", c.MongoURIUpdated)
+	d.Set("mongo_uri_with_options", c.MongoURIWithOptions)
 
 	return nil
 }
@@ -170,6 +218,18 @@ func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 	if d.HasChange("replication_factor") {
 		c.ReplicationFactor = d.Get("replication_factor").(int)
+		requestUpdate = true
+	}
+	if d.HasChange("num_shards") {
+		c.NumShards = d.Get("num_shards").(int)
+		requestUpdate = true
+	}
+	if d.HasChange("paused") {
+		c.Paused = d.Get("paused").(bool)
+		requestUpdate = true
+	}
+	if d.HasChange("disk_gb_enabled") {
+		c.AutoScaling.DiskGBEnabled = d.Get("disk_gb_enabled").(bool)
 		requestUpdate = true
 	}
 
