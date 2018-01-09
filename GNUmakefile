@@ -1,10 +1,17 @@
 TEST?=$$(go list ./... |grep -v 'vendor')
 GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
+TARGETS=darwin linux windows
 
 default: build
 
 build: fmtcheck
 	go install
+
+targets: $(TARGETS)
+
+$(TARGETS):
+	GOOS=$@ GOARCH=amd64 go build -o "dist/terraform-provider-mongodbatlas_${TRAVIS_TAG}_$@_amd64"
+	zip -j dist/terraform-provider-lxd_${TRAVIS_TAG}_$@_amd64.zip dist/terraform-provider-mongodbatlas_${TRAVIS_TAG}_$@_amd64
 
 build-linux: fmtcheck
 	env GOOS=linux GOARCH=amd64 go build
