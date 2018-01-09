@@ -1,6 +1,9 @@
 dist: trusty
 sudo: false
 language: go
+go:
+- 1.9.1
+- master
 
 install:
 - go get github.com/kardianos/govendor
@@ -9,3 +12,8 @@ script:
 - make test
 - make vendor-status
 - make vet
+
+matrix:
+  fast_finish: true
+  allow_failures:
+  - go: tip
