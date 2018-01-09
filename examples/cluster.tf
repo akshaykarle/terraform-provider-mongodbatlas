@@ -8,6 +8,14 @@ provider "mongodbatlas" {
   api_key = "${var.mongodb_atlas_api_key}"
 }
 
+# Create a Container
+resource "mongodbatlas_container" "test" {
+  group = "${var.mongodb_atlas_group_id}"
+  atlas_cidr_block = "10.0.0.0/21"
+  provider_name = "AWS"
+  region = "US_EAST_1"
+}
+
 # Create a Cluster
 resource "mongodbatlas_cluster" "test" {
   name = "test"
