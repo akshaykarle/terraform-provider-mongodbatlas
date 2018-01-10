@@ -68,17 +68,7 @@ func resourceDatabaseUserCreate(d *schema.ResourceData, meta interface{}) error 
 		DatabaseName: d.Get("database").(string),
 	}
 
-	rolesMap := d.Get("roles").([]interface{})
-	params.Roles = make([]mongodb.Role, len(rolesMap))
-	for i, r := range rolesMap {
-		roleMap := r.(map[string]interface{})
-
-		params.Roles[i] = mongodb.Role{
-			RoleName:       roleMap["name"].(string),
-			DatabaseName:   roleMap["database"].(string),
-			CollectionName: roleMap["collection"].(string),
-		}
-	}
+	readRolesFromSchema(params.Roles, d.Get("roles").([]interface{}))
 
 	databaseUser, _, err := client.DatabaseUsers.Create(d.Get("group").(string), &params)
 	if err != nil {
@@ -114,9 +104,46 @@ func resourceDatabaseUserRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceDatabaseUserUpdate(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*mongodb.Client)
+	requestUpdate := false
+
+	c, _, err := client.DatabaseUsers.Get(d.Get("group").(string), d.Id())
+	if err != nil {
+		return fmt.Errorf("Error reading MongoDB DatabaseUser %s: %s", d.Id(), err)
+	}
+
+	if d.HasChange("password") {
+		c.Password = d.Get("password").(string)
+		requestUpdate = true
+	}
+	if d.HasChange("roles") {
+		readRolesFromSchema(c.Roles, d.Get("roles").([]interface{}))
+		requestUpdate = true
+	}
+
+	if requestUpdate {
+		_, _, err := client.DatabaseUsers.Update(d.Get("group").(string), d.Id(), c)
+		if err != nil {
+			return fmt.Errorf("Error updating MongoDB DatabaseUser %s: %s", d.Id(), err)
+		}
+		return resourceDatabaseUserRead(d, meta)
+	}
 	return nil
 }
 
 func resourceDatabaseUserDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
+}
+
+func readRolesFromSchema(roles []mongodb.Role, rolesMap []interface{}) {
+	roles = make([]mongodb.Role, len(rolesMap))
+	for i, r := range rolesMap {
+		roleMap := r.(map[string]interface{})
+
+		roles[i] = mongodb.Role{
+			RoleName:       roleMap["name"].(string),
+			DatabaseName:   roleMap["database"].(string),
+			CollectionName: roleMap["collection"].(string),
+		}
+	}
 }
