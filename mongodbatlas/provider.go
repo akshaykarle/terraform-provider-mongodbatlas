@@ -26,6 +26,7 @@ func Provider() terraform.ResourceProvider {
 			"mongodbatlas_cluster":                resourceCluster(),
 			"mongodbatlas_container":              resourceContainer(),
 			"mongodbatlas_vpc_peering_connection": resourceVpcPeeringConnection(),
+			"mongodbatlas_database_user":          resourceDatabaseUser(),
 		},
 
 		ConfigureFunc: providerConfigure,

@@ -4,6 +4,7 @@ variable "mongodb_atlas_group_id" {}
 variable "aws_account_id" {}
 variable "vpc_id" {}
 variable "vpc_cidr_block" { default = "10.1.0.0/16" }
+variable "database_user_test_password" { default = "mongodb" }
 
 # Configure the MongoDB Atlas Provider
 provider "mongodbatlas" {
@@ -38,4 +39,16 @@ resource "mongodbatlas_cluster" "test" {
   size = "M10"
   backup = false
   disk_size_gb = 4.5
+}
+
+# Create a Database User
+resource "mongodbatlas_database_user" "test" {
+  username = "test"
+  password = "${var.database_user_test_password}"
+  database = "admin"
+  group = "${var.mongodb_atlas_group_id}"
+  roles  = [{
+    name = "read"
+    database = "admin"
+  }]
 }
