@@ -47,8 +47,10 @@ resource "mongodbatlas_database_user" "test" {
   password = "${var.database_user_test_password}"
   database = "admin"
   group = "${var.mongodb_atlas_group_id}"
-  roles  = [{
-    name = "read"
-    database = "admin"
-  }]
+  roles  = [
+    {
+      name = "read"
+      database = "admin"
+    }
+  ]
 }

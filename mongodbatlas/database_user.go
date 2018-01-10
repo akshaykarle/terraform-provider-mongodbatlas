@@ -68,7 +68,7 @@ func resourceDatabaseUserCreate(d *schema.ResourceData, meta interface{}) error 
 		DatabaseName: d.Get("database").(string),
 	}
 
-	readRolesFromSchema(params.Roles, d.Get("roles").([]interface{}))
+	params.Roles = readRolesFromSchema(d.Get("roles").([]interface{}))
 
 	databaseUser, _, err := client.DatabaseUsers.Create(d.Get("group").(string), &params)
 	if err != nil {
@@ -117,7 +117,7 @@ func resourceDatabaseUserUpdate(d *schema.ResourceData, meta interface{}) error 
 		requestUpdate = true
 	}
 	if d.HasChange("roles") {
-		readRolesFromSchema(c.Roles, d.Get("roles").([]interface{}))
+		c.Roles = readRolesFromSchema(d.Get("roles").([]interface{}))
 		requestUpdate = true
 	}
 
@@ -143,7 +143,7 @@ func resourceDatabaseUserDelete(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-func readRolesFromSchema(roles []mongodb.Role, rolesMap []interface{}) {
+func readRolesFromSchema(rolesMap []interface{}) (roles []mongodb.Role) {
 	roles = make([]mongodb.Role, len(rolesMap))
 	for i, r := range rolesMap {
 		roleMap := r.(map[string]interface{})
@@ -154,4 +154,5 @@ func readRolesFromSchema(roles []mongodb.Role, rolesMap []interface{}) {
 			CollectionName: roleMap["collection"].(string),
 		}
 	}
+	return roles
 }
