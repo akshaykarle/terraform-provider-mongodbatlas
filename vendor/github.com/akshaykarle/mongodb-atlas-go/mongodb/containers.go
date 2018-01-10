@@ -57,19 +57,21 @@ func (c *ContainerService) Get(gid string, id string) (*Container, *http.Respons
 
 // Create a container in the specified group.
 // https://docs.atlas.mongodb.com/reference/api/vpc-create-container/
-func (c *ContainerService) Create(gid string, container *Container) (*Container, *http.Response, error) {
+func (c *ContainerService) Create(gid string, containerParams *Container) (*Container, *http.Response, error) {
+	container := new(Container)
 	apiError := new(APIError)
 	path := fmt.Sprintf("%s/containers", gid)
-	resp, err := c.sling.New().Post(path).BodyJSON(container).Receive(container, apiError)
+	resp, err := c.sling.New().Post(path).BodyJSON(containerParams).Receive(container, apiError)
 	return container, resp, relevantError(err, *apiError)
 }
 
 // Update a container in the specified group.
 // https://docs.atlas.mongodb.com/reference/api/vpc-update-container/
-func (c *ContainerService) Update(gid string, id string, container *Container) (*Container, *http.Response, error) {
+func (c *ContainerService) Update(gid string, id string, containerParams *Container) (*Container, *http.Response, error) {
+	container := new(Container)
 	apiError := new(APIError)
 	path := fmt.Sprintf("%s/containers/%s", gid, id)
-	resp, err := c.sling.New().Patch(path).BodyJSON(container).Receive(container, apiError)
+	resp, err := c.sling.New().Patch(path).BodyJSON(containerParams).Receive(container, apiError)
 	return container, resp, relevantError(err, *apiError)
 }
 

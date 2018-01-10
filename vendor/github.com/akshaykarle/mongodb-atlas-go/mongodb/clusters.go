@@ -81,19 +81,21 @@ func (c *ClusterService) Get(gid string, name string) (*Cluster, *http.Response,
 
 // Create a cluster in the specified group.
 // https://docs.atlas.mongodb.com/reference/api/clusters-create-one/
-func (c *ClusterService) Create(gid string, cluster *Cluster) (*Cluster, *http.Response, error) {
+func (c *ClusterService) Create(gid string, clusterParams *Cluster) (*Cluster, *http.Response, error) {
+	cluster := new(Cluster)
 	apiError := new(APIError)
 	path := fmt.Sprintf("%s/clusters", gid)
-	resp, err := c.sling.New().Post(path).BodyJSON(cluster).Receive(cluster, apiError)
+	resp, err := c.sling.New().Post(path).BodyJSON(clusterParams).Receive(cluster, apiError)
 	return cluster, resp, relevantError(err, *apiError)
 }
 
 // Update a cluster in the specified group.
 // https://docs.atlas.mongodb.com/reference/api/clusters-modify-one/
-func (c *ClusterService) Update(gid string, name string, cluster *Cluster) (*Cluster, *http.Response, error) {
+func (c *ClusterService) Update(gid string, name string, clusterParams *Cluster) (*Cluster, *http.Response, error) {
+	cluster := new(Cluster)
 	apiError := new(APIError)
 	path := fmt.Sprintf("%s/clusters/%s", gid, name)
-	resp, err := c.sling.New().Patch(path).BodyJSON(cluster).Receive(cluster, apiError)
+	resp, err := c.sling.New().Patch(path).BodyJSON(clusterParams).Receive(cluster, apiError)
 	return cluster, resp, relevantError(err, *apiError)
 }
 

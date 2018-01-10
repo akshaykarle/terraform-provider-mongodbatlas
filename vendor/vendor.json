@@ -16,10 +16,10 @@
 			"revisionTime": "2018-01-04T19:21:51Z"
 		},
 		{
-			"checksumSHA1": "hxPAFBogvg5R8jglxGiEx4mv/yk=",
+			"checksumSHA1": "zWtNhsePmJxkh3cTBoMXpUdx5aw=",
 			"path": "github.com/akshaykarle/mongodb-atlas-go/mongodb",
-			"revision": "938c772bfd17178abdaa53b22720de4fb627cd6e",
-			"revisionTime": "2018-01-08T22:01:23Z",
+			"revision": "ee15489a7d3e2c3455c308caebe42a43a2b03206",
+			"revisionTime": "2018-01-10T15:57:30Z",
 			"tree": true
 		},
 		{

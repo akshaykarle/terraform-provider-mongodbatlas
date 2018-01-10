@@ -60,19 +60,21 @@ func (c *PeerService) Get(gid string, id string) (*Peer, *http.Response, error) 
 
 // Create a peer in the specified group.
 // https://docs.atlas.mongodb.com/reference/api/vpc-create-peering-connection/
-func (c *PeerService) Create(gid string, peer *Peer) (*Peer, *http.Response, error) {
+func (c *PeerService) Create(gid string, peerParams *Peer) (*Peer, *http.Response, error) {
+	peer := new(Peer)
 	apiError := new(APIError)
 	path := fmt.Sprintf("%s/peers", gid)
-	resp, err := c.sling.New().Post(path).BodyJSON(peer).Receive(peer, apiError)
+	resp, err := c.sling.New().Post(path).BodyJSON(peerParams).Receive(peer, apiError)
 	return peer, resp, relevantError(err, *apiError)
 }
 
 // Update a peer in the specified group.
 // https://docs.atlas.mongodb.com/reference/api/vpc-update-peering-connection/
-func (c *PeerService) Update(gid string, id string, peer *Peer) (*Peer, *http.Response, error) {
+func (c *PeerService) Update(gid string, id string, peerParams *Peer) (*Peer, *http.Response, error) {
+	peer := new(Peer)
 	apiError := new(APIError)
 	path := fmt.Sprintf("%s/peers/%s", gid, id)
-	resp, err := c.sling.New().Patch(path).BodyJSON(peer).Receive(peer, apiError)
+	resp, err := c.sling.New().Patch(path).BodyJSON(peerParams).Receive(peer, apiError)
 	return peer, resp, relevantError(err, *apiError)
 }
 
