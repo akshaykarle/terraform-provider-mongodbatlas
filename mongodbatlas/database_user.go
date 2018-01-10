@@ -132,6 +132,14 @@ func resourceDatabaseUserUpdate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceDatabaseUserDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*mongodb.Client)
+
+	log.Printf("[DEBUG] MongoDB DatabaseUser destroy: %v", d.Id())
+	_, err := client.DatabaseUsers.Delete(d.Get("group").(string), d.Id())
+	if err != nil {
+		return fmt.Errorf("Error destroying MongoDB DatabaseUser %s: %s", d.Id(), err)
+	}
+
 	return nil
 }
 
