@@ -26,7 +26,7 @@ type Peer struct {
 	RouteTableCidrBlock string `json:"routeTableCidrBlock,omitempty"`
 	VpcID               string `json:"vpcId,omitempty"`
 	AwsAccountID        string `json:"awsAccountId,omitempty"`
-	ConnectionID        string `json:"connectionI,omitempty"`
+	ConnectionID        string `json:"connectionId,omitempty"`
 	StatusName          string `json:"statusName,omitempty"`
 	ErrorStateName      string `json:"errorStateName,omitempty"`
 	ContainerID         string `json:"containerId,omitempty"`
