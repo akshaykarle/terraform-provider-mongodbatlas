@@ -237,6 +237,9 @@ func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 		// Set read-only fields to an empty string to make the API happy
 		c.StateName = ""
 		c.MongoDBVersion = ""
+		c.MongoURI = ""
+		c.MongoURIWithOptions = ""
+		c.MongoURIUpdated = ""
 		_, _, err := client.Clusters.Update(d.Get("group").(string), d.Get("name").(string), c)
 		if err != nil {
 			return fmt.Errorf("Error reading MongoDB Cluster %s: %s", d.Get("name").(string), err)
