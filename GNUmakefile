@@ -11,10 +11,7 @@ targets: $(TARGETS)
 
 $(TARGETS):
 	GOOS=$@ GOARCH=amd64 go build -o "dist/terraform-provider-mongodbatlas_${TRAVIS_TAG}_$@_amd64"
-	zip -j dist/terraform-provider-lxd_${TRAVIS_TAG}_$@_amd64.zip dist/terraform-provider-mongodbatlas_${TRAVIS_TAG}_$@_amd64
-
-build-linux: fmtcheck
-	env GOOS=linux GOARCH=amd64 go build
+	zip -j dist/terraform-provider-mongodbatlas_${TRAVIS_TAG}_$@_amd64.zip dist/terraform-provider-mongodbatlas_${TRAVIS_TAG}_$@_amd64
 
 test: fmtcheck
 	go test -i $(TEST) || exit 1
