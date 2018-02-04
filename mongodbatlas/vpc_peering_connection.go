@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/akshaykarle/mongodb-atlas-go/mongodb"
+	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -69,9 +69,9 @@ func resourceVpcPeeringConnection() *schema.Resource {
 }
 
 func resourceVpcPeeringConnectionCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*mongodb.Client)
+	client := meta.(*ma.Client)
 
-	params := mongodb.Peer{
+	params := ma.Peer{
 		RouteTableCidrBlock: d.Get("route_table_cidr_block").(string),
 		VpcID:               d.Get("vpc_id").(string),
 		AwsAccountID:        d.Get("aws_account_id").(string),
@@ -106,7 +106,7 @@ func resourceVpcPeeringConnectionCreate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceVpcPeeringConnectionRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*mongodb.Client)
+	client := meta.(*ma.Client)
 
 	p, _, err := client.Peers.Get(d.Get("group").(string), d.Id())
 	if err != nil {
@@ -130,7 +130,7 @@ func resourceVpcPeeringConnectionUpdate(d *schema.ResourceData, meta interface{}
 }
 
 func resourceVpcPeeringConnectionDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*mongodb.Client)
+	client := meta.(*ma.Client)
 
 	log.Printf("[DEBUG] MongoDB VPC Peering connection destroy: %v", d.Id())
 	_, err := client.Peers.Delete(d.Get("group").(string), d.Id())
@@ -158,7 +158,7 @@ func resourceVpcPeeringConnectionDelete(d *schema.ResourceData, meta interface{}
 	return nil
 }
 
-func resourceVpcPeeringConnectionStateRefreshFunc(id, group string, client *mongodb.Client) resource.StateRefreshFunc {
+func resourceVpcPeeringConnectionStateRefreshFunc(id, group string, client *ma.Client) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
 		p, resp, err := client.Peers.Get(group, id)
 		if err != nil {

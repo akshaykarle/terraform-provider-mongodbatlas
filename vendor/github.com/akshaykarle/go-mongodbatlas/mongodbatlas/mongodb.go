@@ -1,4 +1,4 @@
-package mongodb
+package mongodbatlas
 
 import (
 	"net/http"
@@ -12,6 +12,7 @@ const apiURL = "https://cloud.mongodb.com/api/atlas/v1.0/"
 type Client struct {
 	sling         *sling.Sling
 	Root          *RootService
+	Projects      *ProjectService
 	Clusters      *ClusterService
 	Containers    *ContainerService
 	Peers         *PeerService
@@ -24,6 +25,7 @@ func NewClient(httpClient *http.Client) *Client {
 	return &Client{
 		sling:         base,
 		Root:          newRootService(base.New()),
+		Projects:      newProjectService(base.New()),
 		Clusters:      newClusterService(base.New()),
 		Containers:    newContainerService(base.New()),
 		Peers:         newPeerService(base.New()),

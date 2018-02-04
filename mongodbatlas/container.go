@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/akshaykarle/mongodb-atlas-go/mongodb"
+	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -56,9 +56,9 @@ func resourceContainer() *schema.Resource {
 }
 
 func resourceContainerCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*mongodb.Client)
+	client := meta.(*ma.Client)
 
-	params := mongodb.Container{
+	params := ma.Container{
 		AtlasCidrBlock: d.Get("atlas_cidr_block").(string),
 		ProviderName:   d.Get("provider_name").(string),
 		RegionName:     d.Get("region").(string),
@@ -75,7 +75,7 @@ func resourceContainerCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceContainerRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*mongodb.Client)
+	client := meta.(*ma.Client)
 
 	c, _, err := client.Containers.Get(d.Get("group").(string), d.Id())
 	if err != nil {

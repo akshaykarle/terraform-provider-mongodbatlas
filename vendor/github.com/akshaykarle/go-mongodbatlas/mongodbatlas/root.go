@@ -1,4 +1,4 @@
-package mongodb
+package mongodbatlas
 
 import (
 	"net/http"

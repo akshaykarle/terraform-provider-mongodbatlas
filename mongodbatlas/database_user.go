@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/akshaykarle/mongodb-atlas-go/mongodb"
+	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	"github.com/hashicorp/terraform/helper/schema"
 )
 
@@ -60,9 +60,9 @@ func resourceDatabaseUser() *schema.Resource {
 }
 
 func resourceDatabaseUserCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*mongodb.Client)
+	client := meta.(*ma.Client)
 
-	params := mongodb.DatabaseUser{
+	params := ma.DatabaseUser{
 		Username:     d.Get("username").(string),
 		Password:     d.Get("password").(string),
 		DatabaseName: d.Get("database").(string),
@@ -81,7 +81,7 @@ func resourceDatabaseUserCreate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceDatabaseUserRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*mongodb.Client)
+	client := meta.(*ma.Client)
 
 	c, _, err := client.DatabaseUsers.Get(d.Get("group").(string), d.Id())
 	if err != nil {
@@ -104,7 +104,7 @@ func resourceDatabaseUserRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceDatabaseUserUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*mongodb.Client)
+	client := meta.(*ma.Client)
 	requestUpdate := false
 
 	c, _, err := client.DatabaseUsers.Get(d.Get("group").(string), d.Id())
@@ -132,7 +132,7 @@ func resourceDatabaseUserUpdate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceDatabaseUserDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*mongodb.Client)
+	client := meta.(*ma.Client)
 
 	log.Printf("[DEBUG] MongoDB DatabaseUser destroy: %v", d.Id())
 	_, err := client.DatabaseUsers.Delete(d.Get("group").(string), d.Id())
@@ -143,12 +143,12 @@ func resourceDatabaseUserDelete(d *schema.ResourceData, meta interface{}) error 
 	return nil
 }
 
-func readRolesFromSchema(rolesMap []interface{}) (roles []mongodb.Role) {
-	roles = make([]mongodb.Role, len(rolesMap))
+func readRolesFromSchema(rolesMap []interface{}) (roles []ma.Role) {
+	roles = make([]ma.Role, len(rolesMap))
 	for i, r := range rolesMap {
 		roleMap := r.(map[string]interface{})
 
-		roles[i] = mongodb.Role{
+		roles[i] = ma.Role{
 			RoleName:       roleMap["name"].(string),
 			DatabaseName:   roleMap["database"].(string),
 			CollectionName: roleMap["collection"].(string),

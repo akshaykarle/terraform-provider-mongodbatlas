@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/akshaykarle/mongodb-atlas-go/mongodb"
+	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/helper/schema"
 )
@@ -118,18 +118,18 @@ func resourceCluster() *schema.Resource {
 }
 
 func resourceClusterCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*mongodb.Client)
+	client := meta.(*ma.Client)
 
-	providerSettings := mongodb.ProviderSettings{
+	providerSettings := ma.ProviderSettings{
 		ProviderName:        d.Get("provider_name").(string),
 		BackingProviderName: d.Get("backing_provider").(string),
 		RegionName:          d.Get("region").(string),
 		InstanceSizeName:    d.Get("size").(string),
 	}
-	autoScaling := mongodb.AutoScaling{
+	autoScaling := ma.AutoScaling{
 		DiskGBEnabled: d.Get("disk_gb_enabled").(bool),
 	}
-	params := mongodb.Cluster{
+	params := ma.Cluster{
 		Name:                d.Get("name").(string),
 		MongoDBMajorVersion: d.Get("mongodb_major_version").(string),
 		ProviderSettings:    providerSettings,
@@ -169,7 +169,7 @@ func resourceClusterCreate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceClusterRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*mongodb.Client)
+	client := meta.(*ma.Client)
 
 	c, _, err := client.Clusters.Get(d.Get("group").(string), d.Get("name").(string))
 	if err != nil {
@@ -200,7 +200,7 @@ func resourceClusterRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*mongodb.Client)
+	client := meta.(*ma.Client)
 	requestUpdate := false
 
 	c, _, err := client.Clusters.Get(d.Get("group").(string), d.Get("name").(string))
@@ -266,7 +266,7 @@ func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceClusterDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*mongodb.Client)
+	client := meta.(*ma.Client)
 
 	log.Printf("[DEBUG] MongoDB Cluster destroy: %v", d.Id())
 	_, err := client.Clusters.Delete(d.Get("group").(string), d.Get("name").(string))
@@ -294,7 +294,7 @@ func resourceClusterDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceClusterStateRefreshFunc(name, group string, client *mongodb.Client) resource.StateRefreshFunc {
+func resourceClusterStateRefreshFunc(name, group string, client *ma.Client) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
 		c, resp, err := client.Clusters.Get(group, name)
 		if err != nil {
