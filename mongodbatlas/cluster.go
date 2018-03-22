@@ -40,7 +40,7 @@ func resourceCluster() *schema.Resource {
 			"size": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
+				ForceNew: false,
 			},
 			"provider_name": &schema.Schema{
 				Type:     schema.TypeString,
