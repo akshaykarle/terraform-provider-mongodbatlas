@@ -212,6 +212,10 @@ func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 		c.BackupEnabled = d.Get("backup").(bool)
 		requestUpdate = true
 	}
+	if d.HasChange("size") {
+		c.ProviderSettings.InstanceSizeName = d.Get("size").(string)
+		requestUpdate = true
+	}
 	if d.HasChange("disk_size_gb") {
 		c.DiskSizeGB = d.Get("disk_size_gb").(float64)
 		requestUpdate = true
