@@ -4,12 +4,20 @@ variable "mongodb_atlas_group_id" {}
 variable "aws_account_id" {}
 variable "vpc_id" {}
 variable "vpc_cidr_block" { default = "10.1.0.0/16" }
+variable "whitelist_cidr_block" { default = "179.154.224.127/32" }
 variable "database_user_test_password" { default = "mongodb" }
 
 # Configure the MongoDB Atlas Provider
 provider "mongodbatlas" {
   username = "${var.mongodb_atlas_username}"
   api_key = "${var.mongodb_atlas_api_key}"
+}
+
+# Create a Group IP Whitelist
+resource "mongodbatlas_ip_whitelist" "test" {
+  group = "${var.mongodb_atlas_group_id}"
+  cidr_block = "${var.whitelist_cidr_block}"
+  comment = "test"
 }
 
 # Create a Container
