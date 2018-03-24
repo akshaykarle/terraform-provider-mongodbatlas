@@ -23,6 +23,7 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
+			"mongodbatlas_project":                resourceProject(),
 			"mongodbatlas_cluster":                resourceCluster(),
 			"mongodbatlas_container":              resourceContainer(),
 			"mongodbatlas_vpc_peering_connection": resourceVpcPeeringConnection(),
