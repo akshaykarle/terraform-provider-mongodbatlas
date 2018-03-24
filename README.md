@@ -7,7 +7,7 @@ Terraform provider for [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
 
 ## Requirements
 -	[Terraform](https://www.terraform.io/downloads.html) 0.11.x
--	[Go](https://golang.org/doc/install) 1.9 (to build the provider plugin)
+-	[Go](https://golang.org/doc/install) 1.10 (to build the provider plugin)
 
 ## Installing the Provider
 Follow the instructions to [install it as a plugin](https://www.terraform.io/docs/plugins/basics.html#installing-a-plugin). After placing it into your plugins directory, run `terraform init` to initialize it.
@@ -16,7 +16,6 @@ Follow the instructions to [install it as a plugin](https://www.terraform.io/doc
 ```
 # Configure the MongoDB Atlas Provider
 provider "mongodbatlas" {
-  version = "~> 0.1"
   username = "${var.mongodb_atlas_username}"
   api_key = "${var.mongodb_atlas_api_key}"
 }

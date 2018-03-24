@@ -2,7 +2,7 @@ dist: trusty
 sudo: false
 language: go
 go:
-- 1.9.2
+- 1.10
 - master
 
 install:
@@ -11,6 +11,7 @@ install:
 script:
 - make test
 - make vendor-status
+- make fmtcheck
 - make vet
 
 matrix:
@@ -29,6 +30,6 @@ deploy:
   api_key:
     secure: YGDy+m2daQg3ramYLT/nl7rbiHij9Fss4ZFgvwXl3DYDg3LzL8iMceJUQtXBYtHmKk1WxtNbwd4cACpIPM5Ji82jpo0PeO90hIePNgiRjkTFUaflokHk7PqwaxvoNS/84aBbohLdLnYwbf/yMnx20iYajVHzbypUrCWzJufL9g7bDPGrBygz9jIlCUnTCkypyE3V+jz2Vks13FuIARFKCWCo18fk0HCpuvBDtjw6sVABtng0yBzoH9aQDDbvwWlMPPf5WHdQrZAl2uBL6bhfafSAbDFAFCk6MUj0NzrkyWgWlgQIOhjes53g5uze5uuqCM4lGVV+tjrUwljZQn3V6kBGGmTDYonlv/4+9jdUdE0nSmJ6jlAyy4mk/oErTr/+3tOY+Gheo+uKwMpwuA7VIg9Ge7AYvj6QpCJBJTDu8uzIdtAIdbz0nBw0C00lR/Zy66jjwxjT6PIohXSPwLevUwVr69d7kj3hRMwcrJ3bLf9TUWwCBEzBIrr1hwZPMJL7xGUV7mupenK3Q1ujZUuezewpWnUIuHWTF/MR/n+I1G6zYuExJBHkBPszedH9dj2rCNYlblJotNX3j11Xia21KYEFavYn8NyquH5hWAZQ3jpD+d9BY/L+hIyOR0GT03r0oZk3NIbbLqpGU/ih//HiBJLFWryiQW0IH1Y1yishr70=
   on:
-    go: '1.9.2'
+    go: '1.10'
     repo: akshaykarle/terraform-provider-mongodbatlas
     tags: true
