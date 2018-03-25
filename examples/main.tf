@@ -47,12 +47,11 @@ resource "mongodbatlas_vpc_peering_connection" "test" {
 resource "mongodbatlas_cluster" "test" {
   name = "test"
   group = "${mongodbatlas_project.test.id}"
-  mongodb_major_version = "3.4"
+  mongodb_major_version = "3.6"
   provider_name = "AWS"
   region = "US_EAST_1"
-  size = "M10"
+  size = "M2"
   backup = false
-  disk_size_gb = 4.5
 }
 
 # Create a Database User
