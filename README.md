@@ -41,3 +41,6 @@ Enter the provider directory and build the provider
 $ cd $GOPATH/src/github.com/akshaykarle/terraform-provider-mongodbatlas
 $ make build
 ```
+
+## NOTE
+The `mongodbatlas_project` and `mongodbatlas_container` resources do not destroy the project or container (vpc) in mongo atlas. This due to limitation of the mongo atlas API as it doesn't support deleting these resources.
