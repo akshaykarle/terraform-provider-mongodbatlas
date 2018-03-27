@@ -17,6 +17,12 @@ func resourceCluster() *schema.Resource {
 		Update: resourceClusterUpdate,
 		Delete: resourceClusterDelete,
 
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(40 * time.Minute),
+			Update: schema.DefaultTimeout(40 * time.Minute),
+			Delete: schema.DefaultTimeout(40 * time.Minute),
+		},
+
 		Schema: map[string]*schema.Schema{
 			"name": &schema.Schema{
 				Type:     schema.TypeString,
@@ -40,7 +46,7 @@ func resourceCluster() *schema.Resource {
 			"size": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
+				ForceNew: false,
 			},
 			"provider_name": &schema.Schema{
 				Type:     schema.TypeString,
@@ -210,6 +216,10 @@ func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	if d.HasChange("backup") {
 		c.BackupEnabled = d.Get("backup").(bool)
+		requestUpdate = true
+	}
+	if d.HasChange("size") {
+		c.ProviderSettings.InstanceSizeName = d.Get("size").(string)
 		requestUpdate = true
 	}
 	if d.HasChange("disk_size_gb") {
