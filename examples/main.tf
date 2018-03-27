@@ -53,6 +53,7 @@ resource "mongodbatlas_cluster" "test" {
   region = "US_EAST_1"
   size = "M2"
   backup = false
+  disk_gb_enabled = false
 }
 
 # Create a Database User
