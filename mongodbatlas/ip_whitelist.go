@@ -24,11 +24,13 @@ func resourceIPWhitelist() *schema.Resource {
 			"cidr_block": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 				ForceNew: true,
 			},
 			"ip_address": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+				Computed: true,
 				ForceNew: true,
 			},
 			"comment": &schema.Schema{
