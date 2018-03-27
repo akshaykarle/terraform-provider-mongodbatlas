@@ -48,7 +48,8 @@ resource "mongodbatlas_cluster" "test" {
   name = "test"
   group = "${mongodbatlas_project.test.id}"
   mongodb_major_version = "3.6"
-  provider_name = "AWS"
+  provider_name = "TENANT"
+  backing_provider = "AWS"
   region = "US_EAST_1"
   size = "M2"
   backup = false
