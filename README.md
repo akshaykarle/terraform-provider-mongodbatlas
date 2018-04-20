@@ -28,18 +28,16 @@ resource "mongodbatlas_cluster" "test" {
 Also look at the example under [/examples](/examples).
 
 ## Building the Provider
-Clone repository to: `$GOPATH/src/github.com/akshaykarle/terraform-provider-mongodbatlas`
+Clone and build the repository
 
 ```sh
-$ mkdir -p $GOPATH/src/github.com/akshaykarle; cd $GOPATH/src/github.com/akshaykarle
-$ git clone git@github.com:akshaykarle/terraform-provider-mongodbatlas
+go get github.com/akshaykarle/terraform-provider-mongodbatlas
 ```
 
-Enter the provider directory and build the provider
+Symlink the binary to your terraform plugins directory:
 
 ```sh
-$ cd $GOPATH/src/github.com/akshaykarle/terraform-provider-mongodbatlas
-$ make build
+ln -s $GOPATH/bin/terraform-provider-mongodbatlas ~/.terraform.d/plugins/
 ```
 
 ## NOTE
