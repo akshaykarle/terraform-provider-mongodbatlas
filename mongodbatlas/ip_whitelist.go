@@ -43,24 +43,32 @@ func resourceIPWhitelist() *schema.Resource {
 
 func resourceIPWhitelistCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*ma.Client)
+	cidrBlock := d.Get("cidr_block").(string)
+	ip := d.Get("ip_address").(string)
 
 	params := []ma.Whitelist{
 		ma.Whitelist{
-			CidrBlock: d.Get("cidr_block").(string),
+			CidrBlock: cidrBlock,
 			GroupID:   d.Get("group").(string),
-			IPAddress: d.Get("ip_address").(string),
+			IPAddress: ip,
 			Comment:   d.Get("comment").(string),
 		},
 	}
 
-	w, _, err := client.Whitelist.Create(d.Get("group").(string), params)
+	log.Printf("[DEBUG] Creating MongoDB Project IP Whitelist with CIDR block: %v and IP Address: %v", cidrBlock, ip)
+	whitelists, _, err := client.Whitelist.Create(d.Get("group").(string), params)
 	if err != nil {
 		return fmt.Errorf("Error creating MongoDB Project IP Whitelist: %s", err)
 	}
-	d.SetId(w[0].CidrBlock)
-	log.Printf("[INFO] MongoDB Project IP Whitelist ID: %s", d.Id())
+	for _, w := range whitelists {
+		if (cidrBlock != "" && w.CidrBlock == cidrBlock) || (ip != "" && w.IPAddress == ip) {
+			d.SetId(w.CidrBlock)
+			log.Printf("[INFO] MongoDB Project IP Whitelist ID: %s", d.Id())
 
-	return resourceIPWhitelistRead(d, meta)
+			return resourceIPWhitelistRead(d, meta)
+		}
+	}
+	return fmt.Errorf("MongoDB Project IP Whitelist with CIDR block: %s and IP Address: %s could not be found in the response from MongoDB Atlas", cidrBlock, ip)
 }
 
 func resourceIPWhitelistRead(d *schema.ResourceData, meta interface{}) error {
