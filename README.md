@@ -32,7 +32,7 @@ Clone and build the repository
 
 ```sh
 go get github.com/akshaykarle/terraform-provider-mongodbatlas
-go build github.com/akshaykarle/terraform-provider-mongodbatlas
+make build
 ```
 
 Symlink the binary to your terraform plugins directory:
@@ -45,7 +45,7 @@ ln -s $GOPATH/bin/terraform-provider-mongodbatlas ~/.terraform.d/plugins/
 
 ```sh
 go get -u github.com/akshaykarle/terraform-provider-mongodbatlas
-go build github.com/akshaykarle/terraform-provider-mongodbatlas
+make build
 ```
 
 ## NOTE
