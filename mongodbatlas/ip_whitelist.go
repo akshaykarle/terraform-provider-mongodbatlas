@@ -6,6 +6,7 @@ import (
 
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform/helper/validation"
 )
 
 func resourceIPWhitelist() *schema.Resource {
@@ -34,8 +35,9 @@ func resourceIPWhitelist() *schema.Resource {
 				ForceNew: true,
 			},
 			"comment": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validation.StringLenBetween(0, 80),
 			},
 		},
 	}
