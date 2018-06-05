@@ -23,7 +23,8 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		DataSourcesMap: map[string]*schema.Resource{
-			"mongodbatlas_project": dataSourceProject(),
+			"mongodbatlas_project":   dataSourceProject(),
+			"mongodbatlas_container": dataSourceContainer(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
