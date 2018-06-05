@@ -22,6 +22,10 @@ func Provider() terraform.ResourceProvider {
 			},
 		},
 
+		DataSourcesMap: map[string]*schema.Resource{
+			"mongodbatlas_project": dataSourceProject(),
+		},
+
 		ResourcesMap: map[string]*schema.Resource{
 			"mongodbatlas_project":                resourceProject(),
 			"mongodbatlas_cluster":                resourceCluster(),
