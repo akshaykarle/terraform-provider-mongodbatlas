@@ -29,10 +29,11 @@ func resourceIPWhitelist() *schema.Resource {
 				ForceNew: true,
 			},
 			"ip_address": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				ForceNew: true,
+				Type:          schema.TypeString,
+				Optional:      true,
+				Computed:      true,
+				ForceNew:      true,
+				ConflictsWith: []string{"cidr_block"},
 			},
 			"comment": &schema.Schema{
 				Type:         schema.TypeString,
