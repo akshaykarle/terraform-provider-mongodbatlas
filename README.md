@@ -50,3 +50,8 @@ make build
 
 ## NOTE
 The `mongodbatlas_project` and `mongodbatlas_container` resources do not destroy the project or container (vpc) in mongo atlas. This due to limitation of the mongo atlas API as it doesn't support deleting these resources.
+
+## Contributing
+* Install project dependencies: `go get github.com/kardianos/govendor`
+* Run tests: `make test`
+* Build the binary: `make build`
