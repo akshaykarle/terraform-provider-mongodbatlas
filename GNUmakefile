@@ -42,6 +42,9 @@ errcheck:
 vendor-status:
 	@govendor status
 
+vendor-fetch:
+	@govendor fetch +external +missing
+
 test-compile:
 	@if [ "$(TEST)" = "./..." ]; then \
 		echo "ERROR: Set TEST to a specific package. For example,"; \
