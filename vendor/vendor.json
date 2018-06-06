@@ -16,10 +16,10 @@
 			"revisionTime": "2018-01-04T19:21:51Z"
 		},
 		{
-			"checksumSHA1": "mESyX1MqQvWdZCtn3kJSEljjKoo=",
+			"checksumSHA1": "sLelpIo29D7uHstQ0ALCplFCGFU=",
 			"path": "github.com/akshaykarle/go-mongodbatlas/mongodbatlas",
-			"revision": "b26ef4a3d81be4d9e78e85de07085346724189ff",
-			"revisionTime": "2018-03-24T20:24:22Z",
+			"revision": "ceae5a5351cbd416279db321151fed119374cd04",
+			"revisionTime": "2018-06-06T17:05:32Z",
 			"tree": true
 		},
 		{

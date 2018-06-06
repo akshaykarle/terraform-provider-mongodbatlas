@@ -61,7 +61,7 @@ func resourceCluster() *schema.Resource {
 			"region": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
+				ForceNew: false,
 			},
 			"disk_size_gb": &schema.Schema{
 				Type:     schema.TypeFloat,
@@ -118,6 +118,32 @@ func resourceCluster() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"replication_spec": &schema.Schema{
+				Type:     schema.TypeSet,
+				Optional: true,
+				Computed: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"region": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"priority": {
+							Type:     schema.TypeInt,
+							Required: true,
+						},
+						"electable_nodes": {
+							Type:     schema.TypeInt,
+							Required: true,
+						},
+						"read_only_nodes": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							Default:  0,
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -140,6 +166,7 @@ func resourceClusterCreate(d *schema.ResourceData, meta interface{}) error {
 		ProviderSettings:    providerSettings,
 		BackupEnabled:       d.Get("backup").(bool),
 		ReplicationFactor:   d.Get("replication_factor").(int),
+		ReplicationSpec:     readReplicationSpecsFromSchema(d.Get("replication_spec").(*schema.Set).List()),
 		DiskSizeGB:          d.Get("disk_size_gb").(float64),
 		NumShards:           d.Get("num_shards").(int),
 		Paused:              d.Get("paused").(bool),
@@ -179,6 +206,21 @@ func resourceClusterRead(d *schema.ResourceData, meta interface{}) error {
 	c, _, err := client.Clusters.Get(d.Get("group").(string), d.Get("name").(string))
 	if err != nil {
 		return fmt.Errorf("Error reading MongoDB Cluster %s: %s", d.Get("name").(string), err)
+	}
+
+	replicationSpecs := []interface{}{}
+	for region, replicationSpec := range c.ReplicationSpec {
+		spec := map[string]interface{}{
+			"region":          region,
+			"priority":        replicationSpec.Priority,
+			"electable_nodes": replicationSpec.ElectableNodes,
+			"read_only_nodes": replicationSpec.ReadOnlyNodes,
+		}
+		replicationSpecs = append(replicationSpecs, spec)
+	}
+
+	if err := d.Set("replication_spec", replicationSpecs); err != nil {
+		log.Printf("[WARN] Error setting replication specs set for (%s): %s", d.Get("name"), err)
 	}
 
 	d.Set("name", c.Name)
@@ -227,6 +269,10 @@ func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 	if d.HasChange("replication_factor") {
 		c.ReplicationFactor = d.Get("replication_factor").(int)
+		requestUpdate = true
+	}
+	if d.HasChange("replication_spec") {
+		c.ReplicationSpec = readReplicationSpecsFromSchema(d.Get("replication_spec").(*schema.Set).List())
 		requestUpdate = true
 	}
 	if d.HasChange("num_shards") {
@@ -320,4 +366,17 @@ func resourceClusterStateRefreshFunc(name, group string, client *ma.Client) reso
 
 		return c, c.StateName, nil
 	}
+}
+
+func readReplicationSpecsFromSchema(replicationSpecs []interface{}) map[string]ma.ReplicationSpec {
+	specs := map[string]ma.ReplicationSpec{}
+	for _, r := range replicationSpecs {
+		replicationSpec := r.(map[string]interface{})
+		specs[replicationSpec["region"].(string)] = ma.ReplicationSpec{
+			Priority:       replicationSpec["priority"].(int),
+			ElectableNodes: replicationSpec["electable_nodes"].(int),
+			ReadOnlyNodes:  replicationSpec["read_only_nodes"].(int),
+		}
+	}
+	return specs
 }
