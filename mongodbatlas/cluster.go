@@ -1,8 +1,10 @@
 package mongodbatlas
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
@@ -16,6 +18,9 @@ func resourceCluster() *schema.Resource {
 		Read:   resourceClusterRead,
 		Update: resourceClusterUpdate,
 		Delete: resourceClusterDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceClusterImportState,
+		},
 
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(40 * time.Minute),
@@ -347,6 +352,28 @@ func resourceClusterDelete(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	return nil
+}
+
+func resourceClusterImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	client := meta.(*ma.Client)
+
+	parts := strings.SplitN(d.Id(), "-", 2)
+	if len(parts) != 2 {
+		return nil, errors.New("To import a cluster, use the format {group id}-{cluster name}")
+	}
+	gid := parts[0]
+	name := parts[1]
+
+	c, _, err := client.Clusters.Get(gid, name)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't import cluster %s in group %s, error: %s", gid, name, err.Error())
+	}
+
+	d.SetId(c.ID)
+	d.Set("name", c.Name)
+	d.Set("group", c.GroupID)
+
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceClusterStateRefreshFunc(name, group string, client *ma.Client) resource.StateRefreshFunc {

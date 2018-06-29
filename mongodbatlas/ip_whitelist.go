@@ -1,8 +1,10 @@
 package mongodbatlas
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"strings"
 
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -15,6 +17,9 @@ func resourceIPWhitelist() *schema.Resource {
 		Read:   resourceIPWhitelistRead,
 		Update: resourceIPWhitelistUpdate,
 		Delete: resourceIPWhitelistDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceIPWhiteListImportState,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"group": &schema.Schema{
@@ -104,4 +109,25 @@ func resourceIPWhitelistDelete(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	return nil
+}
+
+func resourceIPWhiteListImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	client := meta.(*ma.Client)
+
+	parts := strings.SplitN(d.Id(), "-", 2)
+	if len(parts) != 2 {
+		return nil, errors.New("To import an ip whitelist, use the format {group id}-{cidr block}")
+	}
+	gid := parts[0]
+	cidr := parts[1]
+
+	ip, _, err := client.Whitelist.Get(gid, cidr)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't import ip whitelist %s in group %s, error: %s", gid, cidr, err.Error())
+	}
+
+	d.SetId(ip.CidrBlock)
+	d.Set("group", ip.GroupID)
+
+	return []*schema.ResourceData{d}, nil
 }
