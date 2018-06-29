@@ -27,6 +27,25 @@ resource "mongodbatlas_cluster" "test" {
 ```
 Also look at the example under [/examples](/examples).
 
+### Importing resources
+
+Currently, only `mongodbatlas_cluster`, `mongodbatlas_database_user` and `mongodbatlas_ip_whitelist` can be imported.
+
+To import any of these resources, you need the project ID (aka. group ID). This can be found in the project
+settings screen.
+
+```
+# Import a cluster
+terraform import mongodbatlas_cluster.example <project ID>-<cluster name>
+
+# Import a database user
+# NOTE: you'll see a plan diff for the password, this is unavoidable since the user read API omits it
+terraform import mongodbatlas_database_user.example <project ID>-<username>
+
+# Import an ip whitelist
+terraform import mongodbatlas_ip_whitelist.example <project ID>-<cidr>
+```
+
 ## Building the Provider
 Clone and build the repository
 

@@ -1,8 +1,10 @@
 package mongodbatlas
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"strings"
 
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -14,6 +16,9 @@ func resourceDatabaseUser() *schema.Resource {
 		Read:   resourceDatabaseUserRead,
 		Update: resourceDatabaseUserUpdate,
 		Delete: resourceDatabaseUserDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceDatabaseUserImportState,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"group": &schema.Schema{
@@ -83,17 +88,17 @@ func resourceDatabaseUserCreate(d *schema.ResourceData, meta interface{}) error 
 func resourceDatabaseUserRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*ma.Client)
 
-	c, _, err := client.DatabaseUsers.Get(d.Get("group").(string), d.Id())
+	u, _, err := client.DatabaseUsers.Get(d.Get("group").(string), d.Id())
 	if err != nil {
-		return fmt.Errorf("Error reading MongoDB DatabaseUser %s: %s", d.Id(), err)
+		return fmt.Errorf("Error reading MongoDB DatabaseUser %s (%s): %s", d.Id(), d.Get("group").(string), err)
 	}
 
-	d.Set("username", c.Username)
-	d.Set("database", c.DatabaseName)
-	rolesMap := make([]map[string]interface{}, len(c.Roles))
-	for i, r := range c.Roles {
+	d.Set("username", u.Username)
+	d.Set("database", u.DatabaseName)
+	rolesMap := make([]map[string]interface{}, len(u.Roles))
+	for i, r := range u.Roles {
 		rolesMap[i] = map[string]interface{}{
-			"role":       r.RoleName,
+			"name":       r.RoleName,
 			"database":   r.DatabaseName,
 			"collection": r.CollectionName,
 		}
@@ -107,22 +112,22 @@ func resourceDatabaseUserUpdate(d *schema.ResourceData, meta interface{}) error 
 	client := meta.(*ma.Client)
 	requestUpdate := false
 
-	c, _, err := client.DatabaseUsers.Get(d.Get("group").(string), d.Id())
+	u, _, err := client.DatabaseUsers.Get(d.Get("group").(string), d.Id())
 	if err != nil {
 		return fmt.Errorf("Error reading MongoDB DatabaseUser %s: %s", d.Id(), err)
 	}
 
 	if d.HasChange("password") {
-		c.Password = d.Get("password").(string)
+		u.Password = d.Get("password").(string)
 		requestUpdate = true
 	}
 	if d.HasChange("roles") {
-		c.Roles = readRolesFromSchema(d.Get("roles").([]interface{}))
+		u.Roles = readRolesFromSchema(d.Get("roles").([]interface{}))
 		requestUpdate = true
 	}
 
 	if requestUpdate {
-		_, _, err := client.DatabaseUsers.Update(d.Get("group").(string), d.Id(), c)
+		_, _, err := client.DatabaseUsers.Update(d.Get("group").(string), d.Id(), u)
 		if err != nil {
 			return fmt.Errorf("Error updating MongoDB DatabaseUser %s: %s", d.Id(), err)
 		}
@@ -141,6 +146,27 @@ func resourceDatabaseUserDelete(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	return nil
+}
+
+func resourceDatabaseUserImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	client := meta.(*ma.Client)
+
+	parts := strings.SplitN(d.Id(), "-", 2)
+	if len(parts) != 2 {
+		return nil, errors.New("To import a user, use the format {group id}-{username}")
+	}
+	gid := parts[0]
+	username := parts[1]
+
+	u, _, err := client.DatabaseUsers.Get(gid, username)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't import user %s in group %s, error: %s", gid, username, err.Error())
+	}
+
+	d.SetId(u.Username)
+	d.Set("group", u.GroupID)
+
+	return []*schema.ResourceData{d}, nil
 }
 
 func readRolesFromSchema(rolesMap []interface{}) (roles []ma.Role) {
