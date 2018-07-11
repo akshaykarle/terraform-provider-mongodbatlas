@@ -28,10 +28,11 @@ func resourceIPWhitelist() *schema.Resource {
 				ForceNew: true,
 			},
 			"cidr_block": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				ForceNew: true,
+				Type:          schema.TypeString,
+				Optional:      true,
+				Computed:      true,
+				ForceNew:      true,
+				ConflictsWith: []string{"ip_address"},
 			},
 			"ip_address": &schema.Schema{
 				Type:          schema.TypeString,
@@ -53,6 +54,11 @@ func resourceIPWhitelistCreate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*ma.Client)
 	cidrBlock := d.Get("cidr_block").(string)
 	ip := d.Get("ip_address").(string)
+
+	if cidrBlock != "" && ip != "" {
+		// cidrBlock & ip are mutually exclusive, use cidrBlock if both are set
+		ip = ""
+	}
 
 	params := []ma.Whitelist{
 		ma.Whitelist{
@@ -96,7 +102,7 @@ func resourceIPWhitelistRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceIPWhitelistUpdate(d *schema.ResourceData, meta interface{}) error {
-	return nil
+	return resourceIPWhitelistCreate(d, meta)
 }
 
 func resourceIPWhitelistDelete(d *schema.ResourceData, meta interface{}) error {
