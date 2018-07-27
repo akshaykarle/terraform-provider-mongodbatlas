@@ -123,7 +123,7 @@ func resourceIPWhiteListImportState(d *schema.ResourceData, meta interface{}) ([
 
 	ip, _, err := client.Whitelist.Get(gid, cidr)
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't import ip whitelist %s in group %s, error: %s", gid, cidr, err.Error())
+		return nil, fmt.Errorf("Couldn't import ip whitelist %s in group %s, error: %s", cidr, gid, err.Error())
 	}
 
 	d.SetId(ip.CidrBlock)

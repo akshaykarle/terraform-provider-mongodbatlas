@@ -160,7 +160,7 @@ func resourceDatabaseUserImportState(d *schema.ResourceData, meta interface{}) (
 
 	u, _, err := client.DatabaseUsers.Get(gid, username)
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't import user %s in group %s, error: %s", gid, username, err.Error())
+		return nil, fmt.Errorf("Couldn't import user %s in group %s, error: %s", username, gid, err.Error())
 	}
 
 	d.SetId(u.Username)

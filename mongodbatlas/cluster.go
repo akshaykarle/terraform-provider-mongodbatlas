@@ -366,7 +366,7 @@ func resourceClusterImportState(d *schema.ResourceData, meta interface{}) ([]*sc
 
 	c, _, err := client.Clusters.Get(gid, name)
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't import cluster %s in group %s, error: %s", gid, name, err.Error())
+		return nil, fmt.Errorf("Couldn't import cluster %s in group %s, error: %s", name, gid, err.Error())
 	}
 
 	d.SetId(c.ID)
