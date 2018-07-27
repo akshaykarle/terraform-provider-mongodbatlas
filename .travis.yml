@@ -2,9 +2,19 @@ dist: trusty
 sudo: required
 services:
   - docker
+
 language: go
 go:
 - "1.10.x"
+
+branches:
+  only:
+  - master
+
+matrix:
+  fast_finish: true
+  allow_failures:
+  - go: tip
 
 install:
 # This script is used by the Travis build to install a cookie for
