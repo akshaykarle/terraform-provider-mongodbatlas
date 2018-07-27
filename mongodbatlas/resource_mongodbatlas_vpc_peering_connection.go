@@ -126,7 +126,49 @@ func resourceVpcPeeringConnectionRead(d *schema.ResourceData, meta interface{}) 
 }
 
 func resourceVpcPeeringConnectionUpdate(d *schema.ResourceData, meta interface{}) error {
-	return nil
+	client := meta.(*ma.Client)
+	requestUpdate := false
+
+	c, _, err := client.Peers.Get(d.Get("group").(string), d.Id())
+	if err != nil {
+		return fmt.Errorf("Error reading MongoDB Peering connection %s: %s", d.Id(), err)
+	}
+
+	if d.HasChange("route_table_cidr_block") {
+		c.RouteTableCidrBlock = d.Get("route_table_cidr_block").(string)
+		requestUpdate = true
+	}
+	if d.HasChange("aws_account_id") {
+		c.AwsAccountID = d.Get("aws_account_id").(string)
+		requestUpdate = true
+	}
+	if d.HasChange("vpc_id") {
+		c.VpcID = d.Get("vpc_id").(string)
+		requestUpdate = true
+	}
+
+	if requestUpdate {
+		_, _, err := client.Peers.Update(d.Get("group").(string), d.Id(), c)
+		if err != nil {
+			return fmt.Errorf("Error reading MongoDB Peering connection %s: %s", d.Id(), err)
+		}
+		stateConf := &resource.StateChangeConf{
+			Pending:    []string{"INITIATING", "FINALIZING"},
+			Target:     []string{"AVAILABLE", "PENDING_ACCEPTANCE"},
+			Refresh:    resourceVpcPeeringConnectionStateRefreshFunc(d.Id(), d.Get("group").(string), client),
+			Timeout:    d.Timeout(schema.TimeoutUpdate),
+			MinTimeout: 10 * time.Second,
+			Delay:      30 * time.Second, // Wait 30 secs before starting
+		}
+
+		// Wait, catching any errors
+		_, err = stateConf.WaitForState()
+		if err != nil {
+			return err
+		}
+	}
+
+	return resourceVpcPeeringConnectionRead(d, meta)
 }
 
 func resourceVpcPeeringConnectionDelete(d *schema.ResourceData, meta interface{}) error {

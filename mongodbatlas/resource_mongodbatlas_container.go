@@ -93,7 +93,35 @@ func resourceContainerRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceContainerUpdate(d *schema.ResourceData, meta interface{}) error {
-	return nil
+	client := meta.(*ma.Client)
+	requestUpdate := false
+
+	c, _, err := client.Containers.Get(d.Get("group").(string), d.Id())
+	if err != nil {
+		return fmt.Errorf("Error reading MongoDB Container %s: %s", d.Id(), err)
+	}
+
+	if d.HasChange("atlas_cidr_block") {
+		c.AtlasCidrBlock = d.Get("atlas_cidr_block").(string)
+		requestUpdate = true
+	}
+	if d.HasChange("provider_name") {
+		c.ProviderName = d.Get("provider_name").(string)
+		requestUpdate = true
+	}
+	if d.HasChange("region") {
+		c.RegionName = d.Get("region").(string)
+		requestUpdate = true
+	}
+
+	if requestUpdate {
+		_, _, err := client.Containers.Update(d.Get("group").(string), d.Id(), c)
+		if err != nil {
+			return fmt.Errorf("Error reading MongoDB Container %s: %s", d.Id(), err)
+		}
+	}
+
+	return resourceContainerRead(d, meta)
 }
 
 func resourceContainerDelete(d *schema.ResourceData, meta interface{}) error {
