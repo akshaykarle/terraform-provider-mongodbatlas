@@ -1,5 +1,7 @@
 dist: trusty
 sudo: required
+services:
+  - docker
 language: go
 go:
 - "1.10.x"
@@ -17,6 +19,7 @@ script:
 - make vendor-status
 - make fmtcheck
 - make vet
+- make website-test
 
 before_deploy:
 - make targets
