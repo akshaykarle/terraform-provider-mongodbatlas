@@ -2,7 +2,7 @@ TEST?=$$(go list ./... |grep -v 'vendor')
 GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
 TARGETS=darwin linux windows
 WEBSITE_REPO=github.com/hashicorp/terraform-website
-PKG_NAME=scaffolding
+PKG_NAME=mongodbatlas
 
 default: build
 
