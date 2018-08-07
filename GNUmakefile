@@ -1,4 +1,5 @@
 TEST?=$$(go list ./... |grep -v 'vendor')
+TESTARGS?=-race -coverprofile=profile.out -covermode=atomic
 GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
 TARGETS=darwin linux windows
 WEBSITE_REPO=github.com/hashicorp/terraform-website
@@ -16,12 +17,10 @@ $(TARGETS):
 	zip -j dist/terraform-provider-mongodbatlas_${TRAVIS_TAG}_$@_amd64.zip dist/terraform-provider-mongodbatlas_${TRAVIS_TAG}_$@_amd64
 
 test: fmtcheck
-	go test -i $(TEST) || exit 1
-	echo $(TEST) | \
-		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
+	TESTARGS="$(TESTARGS)" sh -c "'$(CURDIR)/scripts/gotest.sh'"
 
 testacc: fmtcheck
-	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 120m
+	TF_ACC=1 TESTARGS="$(TESTARGS) -timeout 120m" sh -c "'$(CURDIR)/scripts/gotest.sh'"
 
 vet:
 	@echo "go vet ."

@@ -1,6 +1,7 @@
 # terraform-provider-mongodbatlas
 [![Build Status](https://travis-ci.org/akshaykarle/terraform-provider-mongodbatlas.svg?branch=master)](https://travis-ci.org/akshaykarle/terraform-provider-mongodbatlas)
 [![GitHub release](https://img.shields.io/github/release/akshaykarle/terraform-provider-mongodbatlas.svg)](https://github.com/akshaykarle/terraform-provider-mongodbatlas/releases)
+[![codecov](https://codecov.io/gh/akshaykarle/terraform-provider-mongodbatlas/branch/master/graph/badge.svg)](https://codecov.io/gh/akshaykarle/terraform-provider-mongodbatlas)
 [![GitHub downloads](https://img.shields.io/github/downloads/akshaykarle/terraform-provider-mongodbatlas/total.svg)]()
 
 Terraform provider for [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
