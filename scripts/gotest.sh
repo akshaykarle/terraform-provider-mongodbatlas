@@ -7,7 +7,7 @@ COVERAGE_PATH=${ROOT_DIR}/coverage.txt
 
 echo "" > ${COVERAGE_PATH}
 
-for d in $(go list ./... | grep -v vendor); do
+for d in ${TEST}; do
     go test ${TESTARGS} -v $d
     r=$?
     if [ $r -ne 0 ]; then
@@ -16,4 +16,4 @@ for d in $(go list ./... | grep -v vendor); do
         cat profile.out >> ${COVERAGE_PATH}
         rm profile.out
     fi
-  done
+done

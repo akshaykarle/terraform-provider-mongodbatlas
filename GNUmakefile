@@ -17,10 +17,10 @@ $(TARGETS):
 	zip -j dist/terraform-provider-mongodbatlas_${TRAVIS_TAG}_$@_amd64.zip dist/terraform-provider-mongodbatlas_${TRAVIS_TAG}_$@_amd64
 
 test: fmtcheck
-	TESTARGS="$(TESTARGS)" sh -c "'$(CURDIR)/scripts/gotest.sh'"
+	TEST="$(TEST)" TESTARGS="$(TESTARGS)" sh -c "'$(CURDIR)/scripts/gotest.sh'"
 
 testacc: fmtcheck
-	TF_ACC=1 TESTARGS="$(TESTARGS) -timeout 120m" sh -c "'$(CURDIR)/scripts/gotest.sh'"
+	TF_ACC=1 TEST="$(TEST)" TESTARGS="$(TESTARGS) -timeout 120m" sh -c "'$(CURDIR)/scripts/gotest.sh'"
 
 vet:
 	@echo "go vet ."
