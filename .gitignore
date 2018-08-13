@@ -1,5 +1,6 @@
 .terraform
 *.tfstate*
+*.auto.tfvars
 examples/terraform.d
 dist/
 .DS_Store

@@ -34,6 +34,7 @@ func Provider() terraform.ResourceProvider {
 			"mongodbatlas_vpc_peering_connection": resourceVpcPeeringConnection(),
 			"mongodbatlas_ip_whitelist":           resourceIPWhitelist(),
 			"mongodbatlas_database_user":          resourceDatabaseUser(),
+			"mongodbatlas_alert_configuration":    resourceAlertConfiguration(),
 		},
 
 		ConfigureFunc: providerConfigure,
