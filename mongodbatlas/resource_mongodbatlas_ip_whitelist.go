@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"sync"
 
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/helper/validation"
 )
+
+var createMutex = &sync.Mutex{}
 
 func resourceIPWhitelist() *schema.Resource {
 	return &schema.Resource{
@@ -51,6 +54,9 @@ func resourceIPWhitelist() *schema.Resource {
 }
 
 func resourceIPWhitelistCreate(d *schema.ResourceData, meta interface{}) error {
+	createMutex.Lock()
+	defer createMutex.Unlock()
+
 	client := meta.(*ma.Client)
 	cidrBlock := d.Get("cidr_block").(string)
 	ip := d.Get("ip_address").(string)
