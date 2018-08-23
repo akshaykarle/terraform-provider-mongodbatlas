@@ -208,8 +208,12 @@ func resourceClusterCreate(d *schema.ResourceData, meta interface{}) error {
 func resourceClusterRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*ma.Client)
 
-	c, _, err := client.Clusters.Get(d.Get("group").(string), d.Get("name").(string))
+	c, resp, err := client.Clusters.Get(d.Get("group").(string), d.Get("name").(string))
 	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil
+		}
 		return fmt.Errorf("Error reading MongoDB Cluster %s: %s", d.Get("name").(string), err)
 	}
 
