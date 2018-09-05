@@ -25,7 +25,7 @@ func dataSourceProject() *schema.Resource {
 				Computed: true,
 			},
 			"cluster_count": &schema.Schema{
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Computed: true,
 			},
 		},
