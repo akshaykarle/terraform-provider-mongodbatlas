@@ -71,6 +71,7 @@ func resourceCluster() *schema.Resource {
 			"disk_size_gb": &schema.Schema{
 				Type:     schema.TypeFloat,
 				Optional: true,
+				Computed: true,
 			},
 			"replication_factor": &schema.Schema{
 				Type:     schema.TypeInt,
