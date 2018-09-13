@@ -72,5 +72,13 @@ func resourceProjectRead(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceProjectDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*ma.Client)
+
+	log.Printf("[DEBUG] MongoDB Project destroy: %v", d.Id())
+	_, err := client.Projects.Delete(d.Id())
+	if err != nil {
+		return fmt.Errorf("Error destroying MongoDB Project %s: %s", d.Id(), err)
+	}
+
 	return nil
 }
