@@ -44,7 +44,7 @@ vendor-status:
 	@govendor status
 
 vendor-fetch:
-	@govendor fetch +external +missing
+	@govendor fetch +external +missing +vendor
 
 test-compile:
 	@if [ "$(TEST)" = "./..." ]; then \
