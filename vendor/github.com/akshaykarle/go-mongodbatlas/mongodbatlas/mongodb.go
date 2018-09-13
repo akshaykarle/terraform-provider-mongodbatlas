@@ -18,6 +18,7 @@ type Client struct {
 	Containers    *ContainerService
 	Peers         *PeerService
 	DatabaseUsers *DatabaseUserService
+	Organizations *OrganizationService
 }
 
 // NewClient returns a new Client.
@@ -32,5 +33,6 @@ func NewClient(httpClient *http.Client) *Client {
 		Containers:    newContainerService(base.New()),
 		Peers:         newPeerService(base.New()),
 		DatabaseUsers: newDatabaseUserService(base.New()),
+		Organizations: newOrganizationService(base.New()),
 	}
 }

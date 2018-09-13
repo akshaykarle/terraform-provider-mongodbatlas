@@ -71,3 +71,13 @@ func (c *ProjectService) Create(projectParams *Project) (*Project, *http.Respons
 	resp, err := c.sling.New().Post("").BodyJSON(projectParams).Receive(project, apiError)
 	return project, resp, relevantError(err, *apiError)
 }
+
+// Delete a project.
+// https://docs.atlas.mongodb.com/reference/api/project-delete-one/
+func (c *ProjectService) Delete(id string) (*http.Response, error) {
+	project := new(Project)
+	apiError := new(APIError)
+	path := fmt.Sprintf("%s", id)
+	resp, err := c.sling.New().Delete(path).Receive(project, apiError)
+	return resp, relevantError(err, *apiError)
+}
