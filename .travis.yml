@@ -29,7 +29,7 @@ script:
 - make vendor-status
 - make fmtcheck
 - make vet
-# - make website-test
+- make website-test
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
