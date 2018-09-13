@@ -1,0 +1,62 @@
+<% wrap_layout :inner do %>
+    <% content_for :sidebar do %>
+        <div class="docs-sidebar hidden-print affix-top" role="complementary">
+            <ul class="nav docs-sidenav">
+                <li <%= sidebar_current("docs-home") %>>
+                    <a href="/docs/providers/index.html">All Providers</a>
+                </li>
+
+                <li<%= sidebar_current("docs-mongodbatlas-index") %>>
+                    <a href="/docs/providers/mongodbatlas/index.html">MongoDB Atlas Provider</a>
+                </li>
+
+                <li<%= sidebar_current("docs-mongodbatlas-datasource") %>>
+                    <a href="#">Data Sources</a>
+                    <ul class="nav nav-visible">
+
+                        <li<%= sidebar_current("docs-mongodbatlas-datasource-container") %>>
+                            <a href="/docs/providers/mongodbatlas/d/container.html">mongodbatlas_container</a>
+                        </li>
+
+                        <li<%= sidebar_current("docs-mongodbatlas-datasource-project") %>>
+                            <a href="/docs/providers/mongodbatlas/d/project.html">mongodbatlas_project</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li<%= sidebar_current("docs-mongodbatlas-resource") %>>
+                    <a href="#">Resources</a>
+                    <ul class="nav nav-visible">
+
+                        <li<%= sidebar_current("docs-mongodbatlas-resource-cluster") %>>
+                            <a href="/docs/providers/mongodbatlas/r/cluster.html">mongodbatlas_cluster</a>
+                        </li>
+
+                        <li<%= sidebar_current("docs-mongodbatlas-resource-container") %>>
+                            <a href="/docs/providers/mongodbatlas/r/container.html">mongodbatlas_container</a>
+                        </li>
+
+                        <li<%= sidebar_current("docs-mongodbatlas-resource-database_user") %>>
+                            <a href="/docs/providers/mongodbatlas/r/database_user.html">mongodbatlas_database_user</a>
+                        </li>
+
+                        <li<%= sidebar_current("docs-mongodbatlas-resource-ip_whitelist") %>>
+                            <a href="/docs/providers/mongodbatlas/r/ip_whitelist.html">mongodbatlas_ip_whitelist</a>
+                        </li>
+
+                        <li<%= sidebar_current("docs-mongodbatlas-resource-project") %>>
+                            <a href="/docs/providers/mongodbatlas/r/project.html">mongodbatlas_project</a>
+                        </li>
+
+                        <li<%= sidebar_current("docs-mongodbatlas-resource-vpc_peering_connection") %>>
+                            <a href="/docs/providers/mongodbatlas/r/vpc_peering_connection.html">mongodbatlas_vpc_peering_connection</a>
+                        </li>
+                    </ul>
+                </li>
+
+            </ul>
+        </div>
+    <% end %>
+
+    <%= yield %>
+<% end %>

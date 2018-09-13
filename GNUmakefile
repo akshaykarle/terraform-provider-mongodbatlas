@@ -59,6 +59,13 @@ ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 	echo "$(WEBSITE_REPO) not found in your GOPATH (necessary for layouts and assets), get-ting..."
 	git clone https://$(WEBSITE_REPO) $(GOPATH)/src/$(WEBSITE_REPO)
 endif
+	# For testing until an official provider
+	if [ ! -h $(GOPATH)/src/$(WEBSITE_REPO)/content/source/docs/providers/mongodbatlas ]; then \
+		ln -s ../../../../ext/providers/mongodbatlas/website/docs/ $(GOPATH)/src/$(WEBSITE_REPO)/content/source/docs/providers/mongodbatlas; \
+	fi
+	if [ ! -h $(GOPATH)/src/$(WEBSITE_REPO)/content/source/layouts/mongodbatlas.erb ]; then \
+		ln -s ../../../../ext/providers/mongodbatlas/website/mongodbatlas.erb $(GOPATH)/src/$(WEBSITE_REPO)/content/source/layouts/mongodbatlas.erb; \
+	fi
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 
 website-test:
@@ -66,7 +73,13 @@ ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 	echo "$(WEBSITE_REPO) not found in your GOPATH (necessary for layouts and assets), get-ting..."
 	git clone https://$(WEBSITE_REPO) $(GOPATH)/src/$(WEBSITE_REPO)
 endif
+	# For testing until an official provider
+	if [ ! -h $(GOPATH)/src/$(WEBSITE_REPO)/content/source/docs/providers/mongodbatlas ]; then \
+		ln -s ../../../../ext/providers/mongodbatlas/website/docs/ $(GOPATH)/src/$(WEBSITE_REPO)/content/source/docs/providers/mongodbatlas; \
+	fi
+	if [ ! -h $(GOPATH)/src/$(WEBSITE_REPO)/content/source/layouts/mongodbatlas.erb ]; then \
+		ln -s ../../../../ext/providers/mongodbatlas/website/mongodbatlas.erb $(GOPATH)/src/$(WEBSITE_REPO)/content/source/layouts/mongodbatlas.erb; \
+	fi
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 
-.PHONY: build test testacc vet fmt fmtcheck errcheck vendor-status test-compile
-
+.PHONY: build test testacc vet fmt fmtcheck errcheck vendor-status test-compile website website-test
