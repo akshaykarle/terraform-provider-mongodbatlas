@@ -58,8 +58,12 @@ func resourceProjectCreate(d *schema.ResourceData, meta interface{}) error {
 func resourceProjectRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*ma.Client)
 
-	p, _, err := client.Projects.Get(d.Id())
+	p, resp, err := client.Projects.Get(d.Id())
 	if err != nil {
+		if resp.StatusCode == 404 {
+			d.SetId("")
+			return nil
+		}
 		return fmt.Errorf("Error reading MongoDB Project %s: %s", d.Id(), err)
 	}
 
