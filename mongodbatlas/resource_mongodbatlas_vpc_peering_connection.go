@@ -1,8 +1,10 @@
 package mongodbatlas
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
@@ -16,6 +18,9 @@ func resourceVpcPeeringConnection() *schema.Resource {
 		Read:   resourceVpcPeeringConnectionRead,
 		Update: resourceVpcPeeringConnectionUpdate,
 		Delete: resourceVpcPeeringConnectionDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceVpcPeeringConnectionImportState,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"group": &schema.Schema{
@@ -198,6 +203,40 @@ func resourceVpcPeeringConnectionDelete(d *schema.ResourceData, meta interface{}
 	}
 
 	return nil
+}
+
+func getConnection(client *ma.Client, gid string, connection_id string) (*ma.Peer, error) {
+	peers, _, err := client.Peers.List(gid)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't import vpc peering %s in group %s, error: %s", connection_id, gid, err.Error())
+	}
+	for i := range peers {
+		if peers[i].ConnectionID == connection_id {
+			return &peers[i], nil
+		}
+	}
+	return nil, fmt.Errorf("Couldn't find vpc peering %s in group %s, error: %s", connection_id, gid)
+
+}
+
+func resourceVpcPeeringConnectionImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	parts := strings.SplitN(d.Id(), "-", 2)
+	if len(parts) != 2 {
+		return nil, errors.New("To import a VPC peering, use the format {group id}-{peering connection id}")
+	}
+	gid := parts[0]
+	connection_id := parts[1]
+	client := meta.(*ma.Client)
+	peer, err := getConnection(client, gid, connection_id)
+	if err != nil {
+		return nil, err
+	}
+
+	d.SetId(peer.ID)
+	d.Set("group", gid)
+
+	return []*schema.ResourceData{d}, nil
+
 }
 
 func resourceVpcPeeringConnectionStateRefreshFunc(id, group string, client *ma.Client) resource.StateRefreshFunc {
