@@ -215,7 +215,7 @@ func getConnection(client *ma.Client, gid string, connection_id string) (*ma.Pee
 			return &peers[i], nil
 		}
 	}
-	return nil, fmt.Errorf("Couldn't find vpc peering %s in group %s, error: %s", connection_id, gid)
+	return nil, fmt.Errorf("Couldn't find vpc peering %s in group %s", connection_id, gid)
 
 }
 
