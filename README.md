@@ -69,7 +69,7 @@ make build
 ```
 
 ## NOTE
-The `mongodbatlas_project` and `mongodbatlas_container` resources do not destroy the project or container (vpc) in mongo atlas. This due to limitation of the mongo atlas API as it doesn't support deleting these resources.
+The `mongodbatlas_container` resource does not destroy the container (vpc) in mongo atlas. This is due to a limitation of the mongo atlas API as it doesn't support deleting this resource.
 
 ## Contributing
 * Install project dependencies: `go get github.com/kardianos/govendor`

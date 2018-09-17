@@ -10,8 +10,6 @@ description: |-
 
 `mongodbatlas_project` provides a Project resource. This allows projects to be created.
 
--> **NOTE:** The provider does not currently support deleting Projects.
-
 ## Example Usage
 
 ```hcl
