@@ -30,7 +30,7 @@ Also look at the example under [/examples](/examples).
 
 ### Importing resources
 
-Currently, only `mongodbatlas_cluster`, `mongodbatlas_database_user` and `mongodbatlas_ip_whitelist` can be imported.
+Currently, only `mongodbatlas_cluster`, `mongodbatlas_database_user`, `mongodbatlas_vpc_peering_connection` and `mongodbatlas_ip_whitelist` can be imported.
 
 To import any of these resources, you need the project ID (aka. group ID). This can be found in the project
 settings screen.
@@ -45,6 +45,10 @@ terraform import mongodbatlas_database_user.example <project ID>-<username>
 
 # Import an ip whitelist
 terraform import mongodbatlas_ip_whitelist.example <project ID>-<cidr>
+
+# Import an vpc peering
+# specify the peering connection id( pcx-xxxxxxxxx )
+terrform import mongodbatlas_vpc_peering_connection.example <project ID>-<pcx id>
 ```
 
 ## Building the Provider
