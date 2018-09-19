@@ -42,7 +42,6 @@ func resourceCluster() *schema.Resource {
 			"mongodb_major_version": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
-				ForceNew: true,
 			},
 			"backup": &schema.Schema{
 				Type:     schema.TypeBool,
