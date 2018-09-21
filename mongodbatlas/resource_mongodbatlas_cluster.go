@@ -47,6 +47,11 @@ func resourceCluster() *schema.Resource {
 				Type:     schema.TypeBool,
 				Required: true,
 			},
+			"provider_backup": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 			"size": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
@@ -166,16 +171,17 @@ func resourceClusterCreate(d *schema.ResourceData, meta interface{}) error {
 		DiskGBEnabled: d.Get("disk_gb_enabled").(bool),
 	}
 	params := ma.Cluster{
-		Name:                d.Get("name").(string),
-		MongoDBMajorVersion: d.Get("mongodb_major_version").(string),
-		ProviderSettings:    providerSettings,
-		BackupEnabled:       d.Get("backup").(bool),
-		ReplicationFactor:   d.Get("replication_factor").(int),
-		ReplicationSpec:     readReplicationSpecsFromSchema(d.Get("replication_spec").(*schema.Set).List()),
-		DiskSizeGB:          d.Get("disk_size_gb").(float64),
-		NumShards:           d.Get("num_shards").(int),
-		Paused:              d.Get("paused").(bool),
-		AutoScaling:         autoScaling,
+		Name:                  d.Get("name").(string),
+		MongoDBMajorVersion:   d.Get("mongodb_major_version").(string),
+		ProviderSettings:      providerSettings,
+		BackupEnabled:         d.Get("backup").(bool),
+		ProviderBackupEnabled: d.Get("provider_backup").(bool),
+		ReplicationFactor:     d.Get("replication_factor").(int),
+		ReplicationSpec:       readReplicationSpecsFromSchema(d.Get("replication_spec").(*schema.Set).List()),
+		DiskSizeGB:            d.Get("disk_size_gb").(float64),
+		NumShards:             d.Get("num_shards").(int),
+		Paused:                d.Get("paused").(bool),
+		AutoScaling:           autoScaling,
 	}
 
 	cluster, _, err := client.Clusters.Create(d.Get("group").(string), &params)
@@ -236,6 +242,7 @@ func resourceClusterRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("group", c.GroupID)
 	d.Set("mongodb_major_version", c.MongoDBMajorVersion)
 	d.Set("backup", c.BackupEnabled)
+	d.Set("provider_backup", c.ProviderBackupEnabled)
 	d.Set("size", c.ProviderSettings.InstanceSizeName)
 	d.Set("provider_name", c.ProviderSettings.ProviderName)
 	d.Set("backing_provider", c.ProviderSettings.BackingProviderName)
@@ -266,6 +273,10 @@ func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	if d.HasChange("backup") {
 		c.BackupEnabled = d.Get("backup").(bool)
+		requestUpdate = true
+	}
+	if d.HasChange("provider_backup") {
+		c.ProviderBackupEnabled = d.Get("provider_backup").(bool)
 		requestUpdate = true
 	}
 	if d.HasChange("size") {
