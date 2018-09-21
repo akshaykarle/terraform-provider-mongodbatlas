@@ -93,7 +93,7 @@ resource "mongodbatlas_cluster" "cluster" {
 ## Argument Reference
 
 * `backing_provider` - (Optional) The cloud service provider for a shared tier cluster. One of `AWS`, `GCP` or `AZURE`. Only valid when `provider_name` is `TENANT`. Only `M2` and `M5` size clusters supported.
-* `backup` - (Required) Enable continuous backups.
+* `backup` - (Required) Enable continuous backups. Only one of `backup` and `provider_backup` can be `true`. Cannot be enabled if another cluster in the project is using provider snapshots. See [Continuous Backups](https://docs.atlas.mongodb.com/backup/continuous-backups/) for more information.
 * `disk_gb_enabled` - (Optional) Enable disk auto-scaling. Defaults `true`.
 * `disk_size_gb` - (Optional) AWS/GCP only. Size in GB of the server's root volume. Minimum 10. Maximum is the smaller of: instance RAM * 50 or 4096. Default value depends on instance size. See [Create a Cluster](https://docs.atlas.mongodb.com/reference/api/clusters-create-one/) `providerSettings.instanceSizeName` for default values.
 * `group` - (Required) The ID of the project in which to create the cluster.
@@ -107,6 +107,7 @@ resource "mongodbatlas_cluster" "cluster" {
 
 -> **NOTE:** You cannot create a cluster as `paused`.
 
+* `provider_backup` - (Optional). Enable cloud provider snapshots. Only one of `backup` and `provider_backup` can be `true`. Only supported on AWS and Azure. Cannot be enabled if another cluster in the project is using continuous backups. Replica sets only (`num_shards = 1`). See [Cloud Provider Snapshots](https://docs.atlas.mongodb.com/backup/cloud-provider-snapshots/) for more information. Defaults `false`.
 * `provider_name` - (Required) Name of the cloud provider. Current values are: `AWS`, `GCP`, `AZURE` and `TENANT`. `TENANT` also requires setting `backing_provider`.
 * `region` - (Required) Atlas-style name of the region in which to create the cluster. e.g. `US_EAST_1`. See [Create a Cluster](https://docs.atlas.mongodb.com/reference/api/clusters-create-one/), `providerSettings.regionName`, for valid values. **Note:** Set to an empty string if specifying multiple `replication_spec` blocks.
 * `replication_factor` - (Optional) Number of replica set members. Each shard is a replica set with the specified replication factor if a sharded cluster. Ignored if `replication_spec` is used. Possible values of 3, 5, or 7. Default 3. **Note:** Set to 0 if specifying multiple `replication_spec` blocks.
