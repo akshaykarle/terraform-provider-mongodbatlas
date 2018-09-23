@@ -81,3 +81,11 @@ In addition to all arguments above, the following attributes are exported:
   * FINALIZING
   * AVAILABLE
   * TERMINATING
+
+## Import
+
+VPC Peering Connections can be imported using project ID and peering connection ID, in the format `PROJECTID-PEERINGID`, e.g.
+
+```
+$ terraform import mongodbatlas_vpc_peering_connection.peering 1112222b3bf99403840e8934-vpc-xxxxxxxxxxxxxxxxx
+```
