@@ -43,23 +43,24 @@ type ProviderSettings struct {
 
 // Cluster represents a Cluster configuration in MongoDB.
 type Cluster struct {
-	ID                  string                     `json:"id,omitempty"`
-	GroupID             string                     `json:"groupId,omitempty"`
-	Name                string                     `json:"name,omitempty"`
-	MongoDBVersion      string                     `json:"mongoDBVersion,omitempty"`
-	MongoDBMajorVersion string                     `json:"mongoDBMajorVersion,omitempty"`
-	MongoURI            string                     `json:"mongoURI,omitempty"`
-	MongoURIUpdated     string                     `json:"mongoURIUpdated,omitempty"`
-	MongoURIWithOptions string                     `json:"mongoURIWithOptions,omitempty"`
-	DiskSizeGB          float64                    `json:"diskSizeGB,omitempty"`
-	BackupEnabled       bool                       `json:"backupEnabled"`
-	StateName           string                     `json:"stateName,omitempty"`
-	ReplicationFactor   int                        `json:"replicationFactor,omitempty"`
-	ReplicationSpec     map[string]ReplicationSpec `json:"replicationSpec,omitempty"`
-	NumShards           int                        `json:"numShards,omitempty"`
-	Paused              bool                       `json:"paused"`
-	AutoScaling         AutoScaling                `json:"autoScaling,omitempty"`
-	ProviderSettings    ProviderSettings           `json:"providerSettings,omitempty"`
+	ID                    string                     `json:"id,omitempty"`
+	GroupID               string                     `json:"groupId,omitempty"`
+	Name                  string                     `json:"name,omitempty"`
+	MongoDBVersion        string                     `json:"mongoDBVersion,omitempty"`
+	MongoDBMajorVersion   string                     `json:"mongoDBMajorVersion,omitempty"`
+	MongoURI              string                     `json:"mongoURI,omitempty"`
+	MongoURIUpdated       string                     `json:"mongoURIUpdated,omitempty"`
+	MongoURIWithOptions   string                     `json:"mongoURIWithOptions,omitempty"`
+	DiskSizeGB            float64                    `json:"diskSizeGB,omitempty"`
+	BackupEnabled         bool                       `json:"backupEnabled"`
+	ProviderBackupEnabled bool                       `json:"providerBackupEnabled"`
+	StateName             string                     `json:"stateName,omitempty"`
+	ReplicationFactor     int                        `json:"replicationFactor,omitempty"`
+	ReplicationSpec       map[string]ReplicationSpec `json:"replicationSpec,omitempty"`
+	NumShards             int                        `json:"numShards,omitempty"`
+	Paused                bool                       `json:"paused"`
+	AutoScaling           AutoScaling                `json:"autoScaling,omitempty"`
+	ProviderSettings      ProviderSettings           `json:"providerSettings,omitempty"`
 }
 
 // clusterListResponse is the response from the ClusterService.List.
