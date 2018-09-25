@@ -15,6 +15,7 @@ func TestAccMongodbatlasCluster_basic(t *testing.T) {
 	var cluster ma.Cluster
 	projectName := "test"
 	clusterName := fmt.Sprintf("test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	size := "M10"
 
 	resourceName := "mongodbatlas_cluster.test"
 
@@ -24,7 +25,7 @@ func TestAccMongodbatlasCluster_basic(t *testing.T) {
 		CheckDestroy: testAccCheckMongodbatlasClusterDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccMongodbatlasCluster(projectName, clusterName),
+				Config: testAccMongodbatlasCluster(projectName, clusterName, size),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					testAccCheckMongodbatlasClusterExists(resourceName, &cluster),
 					resource.TestCheckResourceAttrSet(resourceName, "disk_size_gb"),
@@ -37,16 +38,24 @@ func TestAccMongodbatlasCluster_basic(t *testing.T) {
 					resource.TestCheckResourceAttrSet(resourceName, "state"),
 					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
 					resource.TestCheckResourceAttr(resourceName, "mongodb_major_version", "3.6"),
-					resource.TestCheckResourceAttr(resourceName, "provider_name", "TENANT"),
-					resource.TestCheckResourceAttr(resourceName, "backing_provider", "AWS"),
+					resource.TestCheckResourceAttr(resourceName, "provider_name", "AWS"),
 					resource.TestCheckResourceAttr(resourceName, "region", "US_EAST_1"),
-					resource.TestCheckResourceAttr(resourceName, "size", "M2"),
+					resource.TestCheckResourceAttr(resourceName, "size", size),
 					resource.TestCheckResourceAttr(resourceName, "backup", "false"),
 					resource.TestCheckResourceAttr(resourceName, "disk_gb_enabled", "false"),
 					resource.TestCheckResourceAttr(resourceName, "provider_backup", "false"),
 					resource.TestCheckResourceAttr(resourceName, "num_shards", "1"),
 					resource.TestCheckResourceAttr(resourceName, "paused", "false"),
 					resource.TestCheckResourceAttr(resourceName, "replication_factor", "3"),
+				),
+			},
+			{
+				Config: testAccMongodbatlasCluster(projectName, clusterName, "M20"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					testAccCheckMongodbatlasClusterExists(resourceName, &cluster),
+					resource.TestCheckResourceAttrSet(resourceName, "group"),
+					resource.TestCheckResourceAttr(resourceName, "name", clusterName),
+					resource.TestCheckResourceAttr(resourceName, "size", "M20"),
 				),
 			},
 		},
@@ -57,6 +66,7 @@ func TestAccAWSEcsCluster_importBasic(t *testing.T) {
 	projectName := "test"
 	projectID := "5ba8c5c396e8211ae8272486"
 	clusterName := fmt.Sprintf("test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
+	size := "M10"
 	importStateID := fmt.Sprintf("%s-%s", projectID, clusterName)
 
 	resourceName := "mongodbatlas_cluster.test"
@@ -67,7 +77,7 @@ func TestAccAWSEcsCluster_importBasic(t *testing.T) {
 		CheckDestroy: testAccCheckMongodbatlasClusterDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccMongodbatlasCluster(projectName, clusterName),
+				Config: testAccMongodbatlasCluster(projectName, clusterName, size),
 			},
 			{
 				ResourceName:      resourceName,
@@ -134,20 +144,19 @@ func testAccCheckMongodbatlasClusterDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccMongodbatlasCluster(projectName, clusterName string) string {
+func testAccMongodbatlasCluster(projectName, clusterName, size string) string {
 	return fmt.Sprintf(`resource "mongodbatlas_cluster" "test" {
   name = "%s"
   group = "${data.mongodbatlas_project.test.id}"
   mongodb_major_version = "3.6"
-  provider_name = "TENANT"
-  backing_provider = "AWS"
+  provider_name = "AWS"
   region = "US_EAST_1"
-  size = "M2"
+  size = "%s"
   backup = false
   disk_gb_enabled = false
 }
 
 data "mongodbatlas_project" "test" {
   name = "%s"
-}`, clusterName, projectName)
+}`, clusterName, size, projectName)
 }
