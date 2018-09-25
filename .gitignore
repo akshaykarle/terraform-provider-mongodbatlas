@@ -10,3 +10,4 @@ website/build
 website/node_modules
 
 /coverage.txt
+/profile.out
