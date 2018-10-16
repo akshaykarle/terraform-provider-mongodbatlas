@@ -39,6 +39,8 @@ type ProviderSettings struct {
 	BackingProviderName string `json:"backingProviderName,omitempty"`
 	RegionName          string `json:"regionName,omitempty"`
 	InstanceSizeName    string `json:"instanceSizeName,omitempty"`
+	DiskIOPS            int    `json:"diskIOPS,omitempty"`
+	EncryptEBSVolume    bool   `json:"encryptEBSVolume,omitempty"`
 }
 
 // Cluster represents a Cluster configuration in MongoDB.
