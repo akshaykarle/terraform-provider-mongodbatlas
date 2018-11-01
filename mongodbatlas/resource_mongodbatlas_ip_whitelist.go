@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform/helper/validation"
 )
 
-var createMutex = &sync.Mutex{}
+var apiMutex = &sync.Mutex{}
 
 func resourceIPWhitelist() *schema.Resource {
 	return &schema.Resource{
@@ -54,8 +54,8 @@ func resourceIPWhitelist() *schema.Resource {
 }
 
 func resourceIPWhitelistCreate(d *schema.ResourceData, meta interface{}) error {
-	createMutex.Lock()
-	defer createMutex.Unlock()
+	apiMutex.Lock()
+	defer apiMutex.Unlock()
 
 	client := meta.(*ma.Client)
 	cidrBlock := d.Get("cidr_block").(string)
@@ -112,6 +112,9 @@ func resourceIPWhitelistUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceIPWhitelistDelete(d *schema.ResourceData, meta interface{}) error {
+	apiMutex.Lock()
+	defer apiMutex.Unlock()
+
 	client := meta.(*ma.Client)
 
 	log.Printf("[DEBUG] MongoDB Project IP Whitelist destroy: %v", d.Id())
