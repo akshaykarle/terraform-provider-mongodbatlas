@@ -62,7 +62,7 @@ func TestAccMongodbatlasCluster_basic(t *testing.T) {
 	})
 }
 
-func TestAccAWSEcsCluster_importBasic(t *testing.T) {
+func TestMongodbatlasCluster_importBasic(t *testing.T) {
 	projectName := "test"
 	projectID := "5ba8c5c396e8211ae8272486"
 	clusterName := fmt.Sprintf("test-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
