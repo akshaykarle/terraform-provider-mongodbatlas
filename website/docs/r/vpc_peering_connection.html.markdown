@@ -46,7 +46,7 @@ resource "mongodbatlas_vpc_peering_connection" "peering" {
   container_id           = "${mongodbatlas_container.container.id}"
 }
 
-resource "aws_vpc_peering_connection_acceptor" "atlas" {
+resource "aws_vpc_peering_connection_accepter" "atlas" {
   vpc_peering_connection_id = "${mongodbatlas_vpc_peering_connection.peering.connection_id}"
   auto_accept               = true
 }
@@ -87,5 +87,5 @@ In addition to all arguments above, the following attributes are exported:
 VPC Peering Connections can be imported using project ID and peering connection ID, in the format `PROJECTID-PEERINGID`, e.g.
 
 ```
-$ terraform import mongodbatlas_vpc_peering_connection.peering 1112222b3bf99403840e8934-vpc-xxxxxxxxxxxxxxxxx
+$ terraform import mongodbatlas_vpc_peering_connection.peering 1112222b3bf99403840e8934-pcx-xxxxxxxxxxxxxxxxx
 ```
