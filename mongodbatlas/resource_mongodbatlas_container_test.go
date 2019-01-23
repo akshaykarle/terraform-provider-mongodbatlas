@@ -13,7 +13,7 @@ import (
 func TestAccMongodbatlasContainer_basic(t *testing.T) {
 	var container ma.Container
 	projectName := "test"
-	cidrBlock := "10.0.0.0/21"
+	cidrBlock := "10.1.0.0/21"
 
 	resourceName := "mongodbatlas_container.test"
 
