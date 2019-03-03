@@ -1,8 +1,10 @@
 package mongodbatlas
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"strings"
 
 	ma "github.com/akshaykarle/go-mongodbatlas/mongodbatlas"
 	"github.com/hashicorp/terraform/helper/schema"
@@ -14,6 +16,9 @@ func resourceContainer() *schema.Resource {
 		Read:   resourceContainerRead,
 		Update: resourceContainerUpdate,
 		Delete: resourceContainerDelete,
+		Importer: &schema.ResourceImporter{
+			State: resourceContainerImportState,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"group": &schema.Schema{
@@ -126,4 +131,30 @@ func resourceContainerUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceContainerDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
+}
+
+func resourceContainerImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	parts := strings.SplitN(d.Id(), "-", 2)
+	if len(parts) != 2 {
+		return nil, errors.New("To import a container, use the format {group id}-{container id}")
+	}
+	gid := parts[0]
+	containerID := parts[1]
+	client := meta.(*ma.Client)
+	c, _, err := client.Containers.Get(gid, containerID)
+	if err != nil {
+		return nil, fmt.Errorf("Error reading MongoDB Container %s: %s", containerID, err)
+	}
+
+	d.SetId(c.ID)
+	d.Set("group", gid)
+	d.Set("atlas_cidr_block", c.AtlasCidrBlock)
+	d.Set("provider_name", c.ProviderName)
+	d.Set("region", c.RegionName)
+	d.Set("vpc_id", c.VpcID)
+	d.Set("identifier", c.ID)
+	d.Set("provisioned", c.Provisioned)
+
+	return []*schema.ResourceData{d}, nil
+
 }

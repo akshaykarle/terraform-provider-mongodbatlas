@@ -34,3 +34,11 @@ In addition to all arguments above, the following attributes are exported:
 * `id` - The id of the project. Used for `group` arguments in resources.
 * `cluster_count` - The number of Atlas clusters deployed in the project.
 * `created` - The ISO-8601 formatted timestamp of when Atlas created the project.
+
+## Import
+
+Project can be imported using project id:
+
+```
+terraform import mongodbatlas_project.project 213w4tergr3245rtf
+```

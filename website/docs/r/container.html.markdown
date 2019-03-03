@@ -68,4 +68,8 @@ In addition to all arguments above, the following attributes are exported:
 
 ## Import
 
-There is no need to import a container. Define a resource in the same project and region to adopt or modify the existing container.
+Container can be imported using project ID and container ID, in the format `PROJECTID-CONTAINERID`, e.g.
+
+```
+$ terraform import mongodbatlas_container.conteiner 1112222b3bf99403840e8934-234treg3245trewq32435tre
+```
