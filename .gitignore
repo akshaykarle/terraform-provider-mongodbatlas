@@ -12,3 +12,5 @@ website/node_modules
 
 /coverage.txt
 /profile.out
+
+.idea/
