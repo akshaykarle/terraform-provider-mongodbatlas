@@ -151,6 +151,11 @@ func resourceCluster() *schema.Resource {
 							Optional: true,
 							Default:  0,
 						},
+						"analytics_nodes": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							Default:  0,
+						},
 					},
 				},
 			},
@@ -230,6 +235,7 @@ func resourceClusterRead(d *schema.ResourceData, meta interface{}) error {
 			"priority":        replicationSpec.Priority,
 			"electable_nodes": replicationSpec.ElectableNodes,
 			"read_only_nodes": replicationSpec.ReadOnlyNodes,
+			"analytics_nodes": replicationSpec.AnalyticsNodes,
 		}
 		replicationSpecs = append(replicationSpecs, spec)
 	}
@@ -418,6 +424,7 @@ func readReplicationSpecsFromSchema(replicationSpecs []interface{}) map[string]m
 			Priority:       replicationSpec["priority"].(int),
 			ElectableNodes: replicationSpec["electable_nodes"].(int),
 			ReadOnlyNodes:  replicationSpec["read_only_nodes"].(int),
+			AnalyticsNodes: replicationSpec["analytics_nodes"].(int),
 		}
 	}
 	return specs
