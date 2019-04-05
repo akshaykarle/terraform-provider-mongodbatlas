@@ -37,10 +37,20 @@ func resourceContainer() *schema.Resource {
 			},
 			"region": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 				ForceNew: true,
 			},
 			"vpc_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"gcp_project_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"network_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -66,7 +76,12 @@ func resourceContainerCreate(d *schema.ResourceData, meta interface{}) error {
 	params := ma.Container{
 		AtlasCidrBlock: d.Get("atlas_cidr_block").(string),
 		ProviderName:   d.Get("provider_name").(string),
-		RegionName:     d.Get("region").(string),
+	}
+
+	// Supply needfuls when GCP
+	if params.ProviderName == "GCP" {
+		params.GcpProjectID = d.Get("gcp_project_id").(string)
+		params.NetworkName = d.Get("network_name").(string)
 	}
 
 	container, _, err := client.Containers.Create(d.Get("group").(string), &params)
@@ -89,10 +104,16 @@ func resourceContainerRead(d *schema.ResourceData, meta interface{}) error {
 
 	d.Set("atlas_cidr_block", c.AtlasCidrBlock)
 	d.Set("provider_name", c.ProviderName)
-	d.Set("region", c.RegionName)
-	d.Set("vpc_id", c.VpcID)
 	d.Set("identifier", c.ID)
 	d.Set("provisioned", c.Provisioned)
+
+	if c.ProviderName == "GCP" {
+		d.Set("gcp_project_id", c.GcpProjectID)
+		d.Set("network_name", c.NetworkName)
+	} else if c.ProviderName == "AWS" {
+		d.Set("vpc_id", c.VpcID)
+		d.Set("region", c.RegionName)
+	}
 
 	return nil
 }

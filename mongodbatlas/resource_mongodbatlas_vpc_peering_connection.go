@@ -205,8 +205,8 @@ func resourceVpcPeeringConnectionDelete(d *schema.ResourceData, meta interface{}
 	return nil
 }
 
-func getConnection(client *ma.Client, gid string, connection_id string) (*ma.Peer, error) {
-	peers, _, err := client.Peers.List(gid)
+func getConnection(client *ma.Client, gid string, providerName string, connection_id string) (*ma.Peer, error) {
+	peers, _, err := client.Peers.List(gid, providerName)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't import vpc peering %s in group %s, error: %s", connection_id, gid, err.Error())
 	}
