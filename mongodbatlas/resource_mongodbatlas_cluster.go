@@ -316,6 +316,7 @@ func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 	if requestUpdate {
 		// Set read-only fields to an empty string to make the API happy
 		c.StateName = ""
+		c.MongoDBVersion = ""
 		c.MongoURI = ""
 		c.MongoURIWithOptions = ""
 		c.MongoURIUpdated = ""
