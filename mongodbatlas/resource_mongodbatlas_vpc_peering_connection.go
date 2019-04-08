@@ -205,18 +205,12 @@ func resourceVpcPeeringConnectionDelete(d *schema.ResourceData, meta interface{}
 	return nil
 }
 
-func getConnection(client *ma.Client, gid string, providerName string, connection_id string) (*ma.Peer, error) {
-	peers, _, err := client.Peers.List(gid, providerName)
+func getConnection(client *ma.Client, gid string, connectionID string) (*ma.Peer, error) {
+	peer, _, err := client.Peers.Get(gid, connectionID)
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't import vpc peering %s in group %s, error: %s", connection_id, gid, err.Error())
+		return nil, fmt.Errorf("Couldn't import vpc peering %s in group %s, error: %s", connectionID, gid, err.Error())
 	}
-	for i := range peers {
-		if peers[i].ConnectionID == connection_id {
-			return &peers[i], nil
-		}
-	}
-	return nil, fmt.Errorf("Couldn't find vpc peering %s in group %s", connection_id, gid)
-
+	return peer, nil
 }
 
 func resourceVpcPeeringConnectionImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
@@ -225,9 +219,9 @@ func resourceVpcPeeringConnectionImportState(d *schema.ResourceData, meta interf
 		return nil, errors.New("To import a VPC peering, use the format {group id}-{peering connection id}")
 	}
 	gid := parts[0]
-	connection_id := parts[1]
+	connectionID := parts[1]
 	client := meta.(*ma.Client)
-	peer, err := getConnection(client, gid, connection_id)
+	peer, err := getConnection(client, gid, connectionID)
 	if err != nil {
 		return nil, err
 	}
