@@ -16,13 +16,17 @@ func dataSourceContainer() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"container_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"atlas_cidr_block": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 			},
 			"provider_name": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 				ForceNew: true,
 			},
 			"region": &schema.Schema{
@@ -66,7 +70,7 @@ func dataSourceContainer() *schema.Resource {
 
 func dataSourceContainerRead(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*ma.Client)
-	id := d.Get("identifier").(string)
+	id := d.Get("container_id").(string)
 	group := d.Get("group").(string)
 
 	c, _, err := client.Containers.Get(group, id)

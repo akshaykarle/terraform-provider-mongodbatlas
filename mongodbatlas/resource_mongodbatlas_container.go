@@ -98,7 +98,7 @@ func resourceContainerCreate(d *schema.ResourceData, meta interface{}) error {
 
 	if d.Get("private_ip_mode").(bool) {
 		log.Printf("Attempting to enable PrivateIPMode")
-		_, err := client.PrivateIPMode.EnablePrivateIPMode(d.Get("group").(string))
+		_, err := client.PrivateIPMode.Enable(d.Get("group").(string))
 
 		if err != nil {
 			return fmt.Errorf("Error attempting to enable PrivateIPMode: %s", err)
@@ -163,12 +163,12 @@ func resourceContainerUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 	if d.HasChange("private_ip_mode") {
 		if d.Get("private_ip_mode").(bool) == false {
-			_, err := client.PrivateIPMode.DisablePrivateIPMode(d.Get("group").(string))
+			_, err := client.PrivateIPMode.Disable(d.Get("group").(string))
 			if err != nil {
 				return fmt.Errorf("Error disabling PrivateIPMode on MongoDB Container %s: %s", d.Id(), err)
 			}
 		} else if d.Get("private_ip_mode").(bool) == true {
-			_, err := client.PrivateIPMode.EnablePrivateIPMode(d.Get("group").(string))
+			_, err := client.PrivateIPMode.Enable(d.Get("group").(string))
 			if err != nil {
 				return fmt.Errorf("Error enabling PrivateIPMode on MongoDB Container %s: %s", d.Id(), err)
 			}
@@ -186,6 +186,21 @@ func resourceContainerUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceContainerDelete(d *schema.ResourceData, meta interface{}) error {
+
+	// Adding this in as it can be used when the DELETE call is actually available.
+
+	// client := meta.(*ma.Client)
+
+	// _, err := client.Containers.Delete(d.Get("group").(string), d.Id())
+	// if err != nil {
+	// 	return fmt.Errorf("Error deleting MongoDB Container %s: %s", d.Id(), err)
+	// }
+
+	// _, err = client.PrivateIPMode.Disable(d.Get("group").(string))
+	// if err != nil {
+	// 	return fmt.Errorf("Error deleting MongoDB Container %s: %s", d.Id(), err)
+	// }
+
 	return nil
 }
 
