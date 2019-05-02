@@ -5,7 +5,9 @@ go 1.12
 require (
 	github.com/akshaykarle/go-http-digest-auth-client v0.3.1
 	github.com/akshaykarle/go-mongodbatlas v0.0.0-20190502185858-46d09d059743
+	github.com/client9/misspell v0.3.4
 	github.com/golang/protobuf v1.3.1 // indirect
+	github.com/golangci/golangci-lint v1.16.0
 	github.com/google/go-cmp v0.3.0 // indirect
 	github.com/hashicorp/hcl2 v0.0.0-20190430183046-3dfebdfc4595 // indirect
 	github.com/hashicorp/terraform v0.0.0-20190502144719-b1d0b1383f62
