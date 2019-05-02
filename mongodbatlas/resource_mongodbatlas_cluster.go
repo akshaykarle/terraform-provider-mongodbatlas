@@ -128,6 +128,11 @@ func resourceCluster() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"srv_address": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
 			"replication_spec": &schema.Schema{
 				Type:     schema.TypeSet,
 				Optional: true,
@@ -264,6 +269,7 @@ func resourceClusterRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("mongo_uri", c.MongoURI)
 	d.Set("mongo_uri_updated", c.MongoURIUpdated)
 	d.Set("mongo_uri_with_options", c.MongoURIWithOptions)
+	d.Set("srv_address", c.SrvAddress)
 
 	return nil
 }
@@ -328,6 +334,7 @@ func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 		c.MongoURI = ""
 		c.MongoURIWithOptions = ""
 		c.MongoURIUpdated = ""
+		c.SrvAddress = ""
 		_, _, err := client.Clusters.Update(d.Get("group").(string), d.Get("name").(string), c)
 		if err != nil {
 			return fmt.Errorf("Error reading MongoDB Cluster %s: %s", d.Get("name").(string), err)
