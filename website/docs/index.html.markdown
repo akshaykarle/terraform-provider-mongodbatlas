@@ -12,7 +12,7 @@ The MongoDB Atlas provider is used to interact with the resources supported by
 MongoDB's Atlas service. The provider needs to be configured with the proper
 credentials before it can be used.
 
-Use the nagivation to the left to read about the available resources.
+Use the navigation to the left to read about the available resources.
 
 -> **NOTE:** Groups and projects are synonymous terms. `group` arguments on
 resources are the project ID.
