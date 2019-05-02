@@ -1,41 +1,40 @@
-dist: trusty
+dist: xenial
 sudo: required
 services:
   - docker
-
 language: go
 go:
-- "1.12.x"
+  - "1.12.x"
 env: GOFLAGS=-mod=vendor
+
+git:
+  depth: 1
+
+install:
+  # This script is used by the Travis build to install a cookie for
+  # go.googlesource.com so rate limits are higher when using `go get` to fetch
+  # packages that live there.
+  # See: https://github.com/golang/go/issues/12933
+  - bash scripts/gogetcookie.sh
+  - make tools
+
+script:
+  - make lint
+  - make test
+  - make website-lint
+  - make website-test
 
 branches:
   only:
-  - master
-  - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
-
+    - master
+    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
 matrix:
   fast_finish: true
   allow_failures:
-  - go: tip
-
-install:
-# This script is used by the Travis build to install a cookie for
-# go.googlesource.com so rate limits are higher when using `go get` to fetch
-# packages that live there.
-# See: https://github.com/golang/go/issues/12933
-- bash scripts/gogetcookie.sh
-
-script:
-- make test
-- make fmtcheck
-- make vet
-- make website-test
-
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+    - go: tip
 
 before_deploy:
-- make targets
+  - make targets
 
 deploy:
   provider: releases

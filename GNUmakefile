@@ -1,3 +1,4 @@
+WEBSITE_REPO=github.com/hashicorp/terraform-website
 TEST?=$$(go list ./... |grep -v 'vendor')
 TESTARGS?=-race -coverprofile=profile.out -covermode=atomic
 GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
@@ -10,35 +11,30 @@ default: build
 build: fmtcheck
 	go install
 
-targets: $(TARGETS)
-
-$(TARGETS):
-	GOOS=$@ GOARCH=amd64 CGO_ENABLED=0 go build -o "dist/terraform-provider-mongodbatlas_${TRAVIS_TAG}_$@_amd64"
-	zip -j dist/terraform-provider-mongodbatlas_${TRAVIS_TAG}_$@_amd64.zip dist/terraform-provider-mongodbatlas_${TRAVIS_TAG}_$@_amd64
-
 test: fmtcheck
-	TEST="$(TEST)" TESTARGS="$(TESTARGS)" sh -c "'$(CURDIR)/scripts/gotest.sh'"
+	go test $(TEST) -timeout=30s -parallel=4
 
 testacc: fmtcheck
-	TF_ACC=1 TEST="$(TEST)" TESTARGS="$(TESTARGS) -timeout 120m" sh -c "'$(CURDIR)/scripts/gotest.sh'"
-
-vet:
-	@echo "go vet ."
-	@go vet $$(go list ./... | grep -v vendor/) ; if [ $$? -eq 1 ]; then \
-		echo ""; \
-		echo "Vet found suspicious constructs. Please check the reported constructs"; \
-		echo "and fix them if necessary before submitting the code for review."; \
-		exit 1; \
-	fi
+	TF_ACC=1 go test $(TEST) -v -parallel 20 $(TESTARGS) -timeout 120m
 
 fmt:
-	gofmt -w $(GOFMT_FILES)
+	@echo "==> Fixing source code with gofmt..."
+	gofmt -s -w ./$(PKG_NAME)
 
+# Currently required by tf-deploy compile
 fmtcheck:
 	@sh -c "'$(CURDIR)/scripts/gofmtcheck.sh'"
 
-errcheck:
-	@sh -c "'$(CURDIR)/scripts/errcheck.sh'"
+websitefmtcheck:
+	@sh -c "'$(CURDIR)/scripts/websitefmtcheck.sh'"
+
+lint:
+	@echo "==> Checking source code against linters..."
+	@GOGC=30 golangci-lint run ./$(PKG_NAME)
+
+tools:
+	GO111MODULE=on go install github.com/client9/misspell/cmd/misspell
+	GO111MODULE=on go install github.com/golangci/golangci-lint/cmd/golangci-lint
 
 test-compile:
 	@if [ "$(TEST)" = "./..." ]; then \
@@ -53,27 +49,23 @@ ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 	echo "$(WEBSITE_REPO) not found in your GOPATH (necessary for layouts and assets), get-ting..."
 	git clone https://$(WEBSITE_REPO) $(GOPATH)/src/$(WEBSITE_REPO)
 endif
-	# For testing until an official provider
-	if [ ! -h $(GOPATH)/src/$(WEBSITE_REPO)/content/source/docs/providers/mongodbatlas ]; then \
-		ln -s ../../../../ext/providers/mongodbatlas/website/docs/ $(GOPATH)/src/$(WEBSITE_REPO)/content/source/docs/providers/mongodbatlas; \
-	fi
-	if [ ! -h $(GOPATH)/src/$(WEBSITE_REPO)/content/source/layouts/mongodbatlas.erb ]; then \
-		ln -s ../../../../ext/providers/mongodbatlas/website/mongodbatlas.erb $(GOPATH)/src/$(WEBSITE_REPO)/content/source/layouts/mongodbatlas.erb; \
-	fi
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
+
+website-lint:
+	@echo "==> Checking website against linters..."
+	@misspell -error -source=text website/
 
 website-test:
 ifeq (,$(wildcard $(GOPATH)/src/$(WEBSITE_REPO)))
 	echo "$(WEBSITE_REPO) not found in your GOPATH (necessary for layouts and assets), get-ting..."
 	git clone https://$(WEBSITE_REPO) $(GOPATH)/src/$(WEBSITE_REPO)
 endif
-	# For testing until an official provider
-	if [ ! -h $(GOPATH)/src/$(WEBSITE_REPO)/content/source/docs/providers/mongodbatlas ]; then \
-		ln -s ../../../../ext/providers/mongodbatlas/website/docs/ $(GOPATH)/src/$(WEBSITE_REPO)/content/source/docs/providers/mongodbatlas; \
-	fi
-	if [ ! -h $(GOPATH)/src/$(WEBSITE_REPO)/content/source/layouts/mongodbatlas.erb ]; then \
-		ln -s ../../../../ext/providers/mongodbatlas/website/mongodbatlas.erb $(GOPATH)/src/$(WEBSITE_REPO)/content/source/layouts/mongodbatlas.erb; \
-	fi
 	@$(MAKE) -C $(GOPATH)/src/$(WEBSITE_REPO) website-provider-test PROVIDER_PATH=$(shell pwd) PROVIDER_NAME=$(PKG_NAME)
 
-.PHONY: build test testacc vet fmt fmtcheck errcheck vendor-status test-compile website website-test
+targets: $(TARGETS)
+
+$(TARGETS):
+	GOOS=$@ GOARCH=amd64 CGO_ENABLED=0 go build -o "dist/terraform-provider-mongodbatlas_${TRAVIS_TAG}_$@_amd64"
+	zip -j dist/terraform-provider-mongodbatlas_${TRAVIS_TAG}_$@_amd64.zip dist/terraform-provider-mongodbatlas_${TRAVIS_TAG}_$@_amd64
+
+.PHONY: build test testacc fmt fmtcheck lint tools test-compile website website-lint website-test targets darwin linux windows
