@@ -290,6 +290,8 @@ func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 	if d.HasChange("disk_size_gb") {
 		c.DiskSizeGB = d.Get("disk_size_gb").(float64)
+		// Don't provide IOPS on disk update, it will be calculated
+		c.ProviderSettings.DiskIOPS = 0
 		requestUpdate = true
 	}
 	if d.HasChange("replication_factor") {
