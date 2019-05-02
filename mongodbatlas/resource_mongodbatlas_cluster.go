@@ -271,6 +271,11 @@ func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error reading MongoDB Cluster %s: %s", d.Get("name").(string), err)
 	}
 
+	if d.HasChange("mongodb_major_version") {
+		c.MongoDBMajorVersion = d.Get("mongodb_major_version").(string)
+		requestUpdate = true
+	}
+
 	if d.HasChange("backup") {
 		c.BackupEnabled = d.Get("backup").(bool)
 		requestUpdate = true
