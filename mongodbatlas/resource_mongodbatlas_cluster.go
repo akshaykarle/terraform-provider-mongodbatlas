@@ -151,6 +151,11 @@ func resourceCluster() *schema.Resource {
 							Optional: true,
 							Default:  0,
 						},
+						"analytics_nodes": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							Default:  0,
+						},
 					},
 				},
 			},
@@ -230,6 +235,7 @@ func resourceClusterRead(d *schema.ResourceData, meta interface{}) error {
 			"priority":        replicationSpec.Priority,
 			"electable_nodes": replicationSpec.ElectableNodes,
 			"read_only_nodes": replicationSpec.ReadOnlyNodes,
+			"analytics_nodes": replicationSpec.AnalyticsNodes,
 		}
 		replicationSpecs = append(replicationSpecs, spec)
 	}
@@ -271,6 +277,11 @@ func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error reading MongoDB Cluster %s: %s", d.Get("name").(string), err)
 	}
 
+	if d.HasChange("mongodb_major_version") {
+		c.MongoDBMajorVersion = d.Get("mongodb_major_version").(string)
+		requestUpdate = true
+	}
+
 	if d.HasChange("backup") {
 		c.BackupEnabled = d.Get("backup").(bool)
 		requestUpdate = true
@@ -285,6 +296,8 @@ func resourceClusterUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 	if d.HasChange("disk_size_gb") {
 		c.DiskSizeGB = d.Get("disk_size_gb").(float64)
+		// Don't provide IOPS on disk update, it will be calculated
+		c.ProviderSettings.DiskIOPS = 0
 		requestUpdate = true
 	}
 	if d.HasChange("replication_factor") {
@@ -418,6 +431,7 @@ func readReplicationSpecsFromSchema(replicationSpecs []interface{}) map[string]m
 			Priority:       replicationSpec["priority"].(int),
 			ElectableNodes: replicationSpec["electable_nodes"].(int),
 			ReadOnlyNodes:  replicationSpec["read_only_nodes"].(int),
+			AnalyticsNodes: replicationSpec["analytics_nodes"].(int),
 		}
 	}
 	return specs

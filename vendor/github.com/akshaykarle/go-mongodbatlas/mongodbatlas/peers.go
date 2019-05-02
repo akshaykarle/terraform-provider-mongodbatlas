@@ -25,10 +25,14 @@ type Peer struct {
 	ProviderName        string `json:"providerName,omitempty"`
 	RouteTableCidrBlock string `json:"routeTableCidrBlock,omitempty"`
 	VpcID               string `json:"vpcId,omitempty"`
+	GcpProjectID        string `json:"gcpProjectId,omitempty"`
 	AwsAccountID        string `json:"awsAccountId,omitempty"`
 	ConnectionID        string `json:"connectionId,omitempty"`
 	StatusName          string `json:"statusName,omitempty"`
+	Status              string `json:"status,omitempty"`
+	NetworkName         string `json:"networkName,omitempty"`
 	ErrorStateName      string `json:"errorStateName,omitempty"`
+	ErrorMessage        string `json:"errorMessage,omitempty"`
 	ContainerID         string `json:"containerId,omitempty"`
 }
 
@@ -40,10 +44,10 @@ type peerListResponse struct {
 
 // List all peers for the specified group.
 // https://docs.atlas.mongodb.com/reference/api/vpc-get-connections-list/
-func (c *PeerService) List(gid string) ([]Peer, *http.Response, error) {
+func (c *PeerService) List(gid string, providerName string) ([]Peer, *http.Response, error) {
 	response := new(peerListResponse)
 	apiError := new(APIError)
-	path := fmt.Sprintf("%s/peers", gid)
+	path := fmt.Sprintf("%s/peers?providerName=%s", gid, providerName)
 	resp, err := c.sling.New().Get(path).Receive(response, apiError)
 	return response.Results, resp, relevantError(err, *apiError)
 }

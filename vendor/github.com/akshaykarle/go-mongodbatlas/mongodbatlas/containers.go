@@ -26,6 +26,8 @@ type Container struct {
 	AtlasCidrBlock string `json:"atlasCidrBlock,omitempty"`
 	RegionName     string `json:"regionName,omitempty"`
 	VpcID          string `json:"vpcId,omitempty"`
+	GcpProjectID   string `json:"gcpProjectId,omitempty"`
+	NetworkName    string `json:"networkName,omitempty"`
 	Provisioned    bool   `json:"provisioned,omitempty"`
 }
 
@@ -37,10 +39,10 @@ type containerListResponse struct {
 
 // List all containers for the specified group.
 // https://docs.atlas.mongodb.com/reference/api/vpc-get-containers-list/
-func (c *ContainerService) List(gid string) ([]Container, *http.Response, error) {
+func (c *ContainerService) List(gid string, providerName string) ([]Container, *http.Response, error) {
 	response := new(containerListResponse)
 	apiError := new(APIError)
-	path := fmt.Sprintf("%s/containers", gid)
+	path := fmt.Sprintf("%s/containers?providerName=%s", gid, providerName)
 	resp, err := c.sling.New().Get(path).Receive(response, apiError)
 	return response.Results, resp, relevantError(err, *apiError)
 }

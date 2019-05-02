@@ -40,12 +40,6 @@ fmtcheck:
 errcheck:
 	@sh -c "'$(CURDIR)/scripts/errcheck.sh'"
 
-vendor-status:
-	@govendor status
-
-vendor-fetch:
-	@govendor fetch +external +missing +vendor
-
 test-compile:
 	@if [ "$(TEST)" = "./..." ]; then \
 		echo "ERROR: Set TEST to a specific package. For example,"; \
