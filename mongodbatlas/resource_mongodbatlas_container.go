@@ -37,10 +37,20 @@ func resourceContainer() *schema.Resource {
 			},
 			"region": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 				ForceNew: true,
 			},
 			"vpc_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"gcp_project_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"network_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -56,6 +66,10 @@ func resourceContainer() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"private_ip_mode": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -66,15 +80,30 @@ func resourceContainerCreate(d *schema.ResourceData, meta interface{}) error {
 	params := ma.Container{
 		AtlasCidrBlock: d.Get("atlas_cidr_block").(string),
 		ProviderName:   d.Get("provider_name").(string),
-		RegionName:     d.Get("region").(string),
+	}
+
+	// Supply needfuls when GCP
+	if params.ProviderName == "GCP" {
+		params.GcpProjectID = d.Get("gcp_project_id").(string)
+		params.NetworkName = d.Get("network_name").(string)
 	}
 
 	container, _, err := client.Containers.Create(d.Get("group").(string), &params)
+
 	if err != nil {
 		return fmt.Errorf("Error creating MongoDB Container: %s", err)
 	}
 	d.SetId(container.ID)
 	log.Printf("[INFO] MongoDB Container ID: %s", d.Id())
+
+	if d.Get("private_ip_mode").(bool) {
+		log.Printf("Attempting to enable PrivateIPMode")
+		_, err := client.PrivateIPMode.Enable(d.Get("group").(string))
+
+		if err != nil {
+			return fmt.Errorf("Error attempting to enable PrivateIPMode: %s", err)
+		}
+	}
 
 	return resourceContainerRead(d, meta)
 }
@@ -89,10 +118,16 @@ func resourceContainerRead(d *schema.ResourceData, meta interface{}) error {
 
 	d.Set("atlas_cidr_block", c.AtlasCidrBlock)
 	d.Set("provider_name", c.ProviderName)
-	d.Set("region", c.RegionName)
-	d.Set("vpc_id", c.VpcID)
 	d.Set("identifier", c.ID)
 	d.Set("provisioned", c.Provisioned)
+
+	if c.ProviderName == "GCP" {
+		d.Set("gcp_project_id", c.GcpProjectID)
+		d.Set("network_name", c.NetworkName)
+	} else if c.ProviderName == "AWS" {
+		d.Set("vpc_id", c.VpcID)
+		d.Set("region", c.RegionName)
+	}
 
 	return nil
 }
@@ -118,6 +153,27 @@ func resourceContainerUpdate(d *schema.ResourceData, meta interface{}) error {
 		c.RegionName = d.Get("region").(string)
 		requestUpdate = true
 	}
+	if d.HasChange("gcp_project_id") {
+		c.GcpProjectID = d.Get("gcp_project_id").(string)
+		requestUpdate = true
+	}
+	if d.HasChange("network_name") {
+		c.NetworkName = d.Get("network_name").(string)
+		requestUpdate = true
+	}
+	if d.HasChange("private_ip_mode") {
+		if d.Get("private_ip_mode").(bool) == false {
+			_, err := client.PrivateIPMode.Disable(d.Get("group").(string))
+			if err != nil {
+				return fmt.Errorf("Error disabling PrivateIPMode on MongoDB Container %s: %s", d.Id(), err)
+			}
+		} else if d.Get("private_ip_mode").(bool) == true {
+			_, err := client.PrivateIPMode.Enable(d.Get("group").(string))
+			if err != nil {
+				return fmt.Errorf("Error enabling PrivateIPMode on MongoDB Container %s: %s", d.Id(), err)
+			}
+		}
+	}
 
 	if requestUpdate {
 		_, _, err := client.Containers.Update(d.Get("group").(string), d.Id(), c)
@@ -130,6 +186,21 @@ func resourceContainerUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceContainerDelete(d *schema.ResourceData, meta interface{}) error {
+
+	// Adding this in as it can be used when the DELETE call is actually available.
+
+	// client := meta.(*ma.Client)
+
+	// _, err := client.Containers.Delete(d.Get("group").(string), d.Id())
+	// if err != nil {
+	// 	return fmt.Errorf("Error deleting MongoDB Container %s: %s", d.Id(), err)
+	// }
+
+	// _, err = client.PrivateIPMode.Disable(d.Get("group").(string))
+	// if err != nil {
+	// 	return fmt.Errorf("Error deleting MongoDB Container %s: %s", d.Id(), err)
+	// }
+
 	return nil
 }
 
@@ -150,10 +221,17 @@ func resourceContainerImportState(d *schema.ResourceData, meta interface{}) ([]*
 	d.Set("group", gid)
 	d.Set("atlas_cidr_block", c.AtlasCidrBlock)
 	d.Set("provider_name", c.ProviderName)
-	d.Set("region", c.RegionName)
-	d.Set("vpc_id", c.VpcID)
 	d.Set("identifier", c.ID)
 	d.Set("provisioned", c.Provisioned)
+
+	if d.Get("provider_name").(string) == "AWS" {
+		d.Set("region", c.RegionName)
+		d.Set("vpc_id", c.VpcID)
+	}
+	if d.Get("provider_name").(string) == "GCP" {
+		d.Set("gcp_project_id", c.GcpProjectID)
+		d.Set("network_name", c.NetworkName)
+	}
 
 	return []*schema.ResourceData{d}, nil
 

@@ -28,18 +28,33 @@ func resourceVpcPeeringConnection() *schema.Resource {
 				Required: true,
 				ForceNew: true,
 			},
-			"route_table_cidr_block": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"aws_account_id": &schema.Schema{
+			"provider_name": &schema.Schema{
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
+			"route_table_cidr_block": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"aws_account_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
 			"vpc_id": &schema.Schema{
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
+				ForceNew: true,
+			},
+			"gcp_project_id": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
+			"network_name": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
 				ForceNew: true,
 			},
 			"container_id": &schema.Schema{
@@ -64,7 +79,17 @@ func resourceVpcPeeringConnection() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"status": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
 			"error_state_name": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+			"error_message": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -77,10 +102,18 @@ func resourceVpcPeeringConnectionCreate(d *schema.ResourceData, meta interface{}
 	client := meta.(*ma.Client)
 
 	params := ma.Peer{
-		RouteTableCidrBlock: d.Get("route_table_cidr_block").(string),
-		VpcID:               d.Get("vpc_id").(string),
-		AwsAccountID:        d.Get("aws_account_id").(string),
-		ContainerID:         d.Get("container_id").(string),
+		ContainerID:  d.Get("container_id").(string),
+		ProviderName: d.Get("provider_name").(string),
+	}
+
+	if d.Get("provider_name").(string) == "AWS" {
+		params.RouteTableCidrBlock = d.Get("route_table_cidr_block").(string)
+		params.VpcID = d.Get("vpc_id").(string)
+		params.AwsAccountID = d.Get("aws_account_id").(string)
+	}
+	if d.Get("provider_name").(string) == "GCP" {
+		params.GcpProjectID = d.Get("gcp_project_id").(string)
+		params.NetworkName = d.Get("network_name").(string)
 	}
 
 	peer, _, err := client.Peers.Create(d.Get("group").(string), &params)
@@ -93,12 +126,12 @@ func resourceVpcPeeringConnectionCreate(d *schema.ResourceData, meta interface{}
 	log.Println("[INFO] Waiting for MongoDB VPC Peering Connection to be available")
 
 	stateConf := &resource.StateChangeConf{
-		Pending:    []string{"INITIATING", "FINALIZING"},
-		Target:     []string{"AVAILABLE", "PENDING_ACCEPTANCE"},
+		Pending:    []string{"INITIATING", "FINALIZING", "ADDING_PEER"},
+		Target:     []string{"AVAILABLE", "PENDING_ACCEPTANCE", "WAITING_FOR_USER"},
 		Refresh:    resourceVpcPeeringConnectionStateRefreshFunc(d.Id(), d.Get("group").(string), client),
 		Timeout:    d.Timeout(schema.TimeoutCreate),
 		MinTimeout: 10 * time.Second,
-		Delay:      30 * time.Second, // Wait 30 secs before starting
+		Delay:      60 * time.Second, // Wait 30 secs before starting
 	}
 
 	// Wait, catching any errors
@@ -118,14 +151,24 @@ func resourceVpcPeeringConnectionRead(d *schema.ResourceData, meta interface{}) 
 		return fmt.Errorf("Error reading MongoDB Peering connection %s: %s", d.Id(), err)
 	}
 
-	d.Set("route_table_cidr_block", p.RouteTableCidrBlock)
-	d.Set("vpc_id", p.VpcID)
-	d.Set("aws_account_id", p.AwsAccountID)
+	if d.Get("provider_name").(string) == "AWS" {
+		d.Set("route_table_cidr_block", p.RouteTableCidrBlock)
+		d.Set("vpc_id", p.VpcID)
+		d.Set("aws_account_id", p.AwsAccountID)
+		d.Set("status_name", p.StatusName)
+		d.Set("error_state_name", p.ErrorStateName)
+		d.Set("connection_id", p.ConnectionID)
+	}
+	if d.Get("provider_name").(string) == "GCP" {
+		log.Println("[INFO]  Provider is GCP")
+		d.Set("network_name", p.NetworkName)
+		d.Set("gcp_project_id", p.GcpProjectID)
+		d.Set("status", p.Status)
+		d.Set("error_message", p.ErrorMessage)
+	}
+
 	d.Set("identifier", p.ID)
 	d.Set("container_id", p.ContainerID)
-	d.Set("connection_id", p.ConnectionID)
-	d.Set("status_name", p.StatusName)
-	d.Set("error_state_name", p.ErrorStateName)
 
 	return nil
 }
@@ -151,6 +194,14 @@ func resourceVpcPeeringConnectionUpdate(d *schema.ResourceData, meta interface{}
 		c.VpcID = d.Get("vpc_id").(string)
 		requestUpdate = true
 	}
+	if d.HasChange("gcp_project_id") {
+		c.GcpProjectID = d.Get("gcp_project_id").(string)
+		requestUpdate = true
+	}
+	if d.HasChange("network_name") {
+		c.NetworkName = d.Get("network_name").(string)
+		requestUpdate = true
+	}
 
 	if requestUpdate {
 		_, _, err := client.Peers.Update(d.Get("group").(string), d.Id(), c)
@@ -158,8 +209,8 @@ func resourceVpcPeeringConnectionUpdate(d *schema.ResourceData, meta interface{}
 			return fmt.Errorf("Error reading MongoDB Peering connection %s: %s", d.Id(), err)
 		}
 		stateConf := &resource.StateChangeConf{
-			Pending:    []string{"INITIATING", "FINALIZING"},
-			Target:     []string{"AVAILABLE", "PENDING_ACCEPTANCE"},
+			Pending:    []string{"INITIATING", "FINALIZING", "ADDING_PEER"},
+			Target:     []string{"AVAILABLE", "PENDING_ACCEPTANCE", "WAITING_FOR_USER", "AVAILABLE"},
 			Refresh:    resourceVpcPeeringConnectionStateRefreshFunc(d.Id(), d.Get("group").(string), client),
 			Timeout:    d.Timeout(schema.TimeoutUpdate),
 			MinTimeout: 10 * time.Second,
@@ -188,12 +239,12 @@ func resourceVpcPeeringConnectionDelete(d *schema.ResourceData, meta interface{}
 	log.Println("[INFO] Waiting for MongoDB VPC Peering Connection to be destroyed")
 
 	stateConf := &resource.StateChangeConf{
-		Pending:    []string{"AVAILABLE", "PENDING_ACCEPTANCE", "INITIATING", "FINALIZING", "TERMINATING"},
+		Pending:    []string{"AVAILABLE", "PENDING_ACCEPTANCE", "INITIATING", "FINALIZING", "TERMINATING", "DELETING"},
 		Target:     []string{"DELETED"},
 		Refresh:    resourceVpcPeeringConnectionStateRefreshFunc(d.Id(), d.Get("group").(string), client),
 		Timeout:    d.Timeout(schema.TimeoutDelete),
 		MinTimeout: 10 * time.Second,
-		Delay:      30 * time.Second, // Wait 30 secs before starting
+		Delay:      60 * time.Second, // Wait 30 secs before starting
 	}
 
 	// Wait, catching any errors
@@ -205,18 +256,12 @@ func resourceVpcPeeringConnectionDelete(d *schema.ResourceData, meta interface{}
 	return nil
 }
 
-func getConnection(client *ma.Client, gid string, connection_id string) (*ma.Peer, error) {
-	peers, _, err := client.Peers.List(gid, connection_id)
+func getConnection(client *ma.Client, gid string, connectionID string) (*ma.Peer, error) {
+	peer, _, err := client.Peers.Get(gid, connectionID)
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't import vpc peering %s in group %s, error: %s", connection_id, gid, err.Error())
+		return nil, fmt.Errorf("Couldn't import vpc peering %s in group %s, error: %s", connectionID, gid, err.Error())
 	}
-	for i := range peers {
-		if peers[i].ConnectionID == connection_id {
-			return &peers[i], nil
-		}
-	}
-	return nil, fmt.Errorf("Couldn't find vpc peering %s in group %s", connection_id, gid)
-
+	return peer, nil
 }
 
 func resourceVpcPeeringConnectionImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
@@ -225,9 +270,9 @@ func resourceVpcPeeringConnectionImportState(d *schema.ResourceData, meta interf
 		return nil, errors.New("To import a VPC peering, use the format {group id}-{peering connection id}")
 	}
 	gid := parts[0]
-	connection_id := parts[1]
+	connectionID := parts[1]
 	client := meta.(*ma.Client)
-	peer, err := getConnection(client, gid, connection_id)
+	peer, err := getConnection(client, gid, connectionID)
 	if err != nil {
 		return nil, err
 	}
@@ -242,6 +287,16 @@ func resourceVpcPeeringConnectionImportState(d *schema.ResourceData, meta interf
 func resourceVpcPeeringConnectionStateRefreshFunc(id, group string, client *ma.Client) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
 		p, resp, err := client.Peers.Get(group, id)
+		status := ""
+
+		if len(p.StatusName) > 0 {
+			status = p.StatusName
+		} else if len(p.Status) > 0 {
+			status = p.Status
+		}
+
+		log.Printf("[INFO] Current status: %s", status)
+
 		if err != nil {
 			if resp.StatusCode == 404 {
 				return 42, "DELETED", nil
@@ -250,10 +305,10 @@ func resourceVpcPeeringConnectionStateRefreshFunc(id, group string, client *ma.C
 			return nil, "", err
 		}
 
-		if p.StatusName != "" {
-			log.Printf("[DEBUG] MongoDB Peer status for cluster: %s: %s", id, p.StatusName)
+		if status != "" {
+			log.Printf("[DEBUG] MongoDB Peer status for cluster: %s: %s", id, status)
 		}
 
-		return p, p.StatusName, nil
+		return p, status, nil
 	}
 }

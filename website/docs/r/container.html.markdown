@@ -18,6 +18,8 @@ description: |-
 
 ## Example Usage
 
+The following example is for the **AWS** provider:
+
 ```hcl
 data "mongodbatlas_project" "project" {
   name = "my-project"
@@ -40,6 +42,55 @@ resource "mongodbatlas_cluster" "cluster" {
 }
 ```
 
+The following example is for the **GCP** provider:
+
+```hcl
+provider "mongodbatlas" {
+  username = "${var.mongodb_atlas_api_username}"
+  api_key = "${var.mongodb_atlas_api_key}"
+}
+
+provider "google" {
+    project = "${var.gcp_project_id}"
+    region = "australia-southeast1"
+}
+
+variable "gcp_project_id" {}
+variable "mongodb_atlas_org_id" {}
+variable "mongodb_atlas_api_username" {}
+variable "mongodb_atlas_api_key" {}
+variable "name_root" { default = "test" }
+
+data "google_compute_network" "default" {
+    name = "default"
+}
+
+data "mongodbatlas_container" "container" {
+    group = "${mongodbatlas_project.project.id}"
+    container_id = "${mongodbatlas_container.container.id}"
+
+    depends_on = ["mongodbatlas_vpc_peering_connection.gcp_peer"]
+}
+
+resource "random_string" "name_suffix" {
+    length = 6
+    upper = false
+    special = false
+}
+
+resource "mongodbatlas_project" "project" {
+    org_id = "${var.mongodb_atlas_org_id}"
+    name = "${var.name_root}-${random_string.name_suffix.result}"
+}
+
+resource "mongodbatlas_container" "container" {
+    atlas_cidr_block = "192.168.100.0/18"
+    provider_name = "GCP"
+    group = "${mongodbatlas_project.project.id}"
+    private_ip_mode = true
+}
+```
+
 ## Argument Reference
 
 * `atlas_cidr_block` - (Required) CIDR block for the Atlas VPC in the Project region. This must be at least a /24 and at most a /21 in one of the following private networks:
@@ -54,8 +105,11 @@ resource "mongodbatlas_cluster" "cluster" {
 -> **NOTE:** The size of the CIDR block affects the number of MongoDB nodes per container. See "Atlas CIDR Block" in the [official documentation](https://docs.atlas.mongodb.com/security-vpc-peering/)
 
 * `group` - (Required) The ID of the project in which to create the container.
-* `provider_name` - (Required) Name of the cloud provider. Currently only `AWS` is supported.
-* `region` - (Required) Atlas-style name of the region in which to create the container. e.g. `US_EAST_1`. See [official documentation](https://docs.atlas.mongodb.com/reference/api/clusters-create-one/), `providerSettings.regionName`, for valid values.
+* `provider_name` - (Required) Name of the cloud provider. Valid options are:
+  * `AWS`
+  * `GCP`
+* `region` ( _AWS_ ) - (Optional) Atlas-style name of the region in which to create the container. e.g. `US_EAST_1`. See [official documentation](https://docs.atlas.mongodb.com/reference/api/clusters-create-one/), `providerSettings.regionName`, for valid values.
+* `private_ip_mode` ( _GCP_ ) - (Optional) Private IP mode applies to GCP dedicated clusters only and is required to use GCP VPC Peering.
 
 ## Attributes Reference
 
@@ -64,7 +118,9 @@ In addition to all arguments above, the following attributes are exported:
 * `id` - The container ID.
 * `identifier` - The same as `id`.
 * `provisioned` - Flag that indicates if the backing VPC has been created.
-* `vpc_id` - The ID of the project's VPC. This will be empty when `provisioned` is `false`
+* `vpc_id` ( _AWS_ ) - The ID of the project's VPC. This will be empty when `provisioned` is `false`
+* `gcp_project_id` ( _GCP_ ) - Unique identifier of the GCP project in which the VPC resides. ( **Not updated until a Peer is connected** )
+* `network_name` ( _GCP_ ) - Name of the VPC of the Atlas project. ( **Not updated until a Peer is connected** )
 
 ## Import
 
