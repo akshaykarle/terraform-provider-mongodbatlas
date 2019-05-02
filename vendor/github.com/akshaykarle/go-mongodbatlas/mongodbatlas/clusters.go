@@ -30,6 +30,7 @@ type ReplicationSpec struct {
 	Priority       int `json:"priority"`
 	ElectableNodes int `json:"electableNodes"`
 	ReadOnlyNodes  int `json:"readOnlyNodes"`
+	AnalyticsNodes int `json:"analyticsNodes"`
 }
 
 // ProviderSettings is the configuration for the provisioned servers on which MongoDB runs.
@@ -53,6 +54,7 @@ type Cluster struct {
 	MongoURI              string                     `json:"mongoURI,omitempty"`
 	MongoURIUpdated       string                     `json:"mongoURIUpdated,omitempty"`
 	MongoURIWithOptions   string                     `json:"mongoURIWithOptions,omitempty"`
+	SrvAddress            string                     `json:"srvAddress,omitempty"`
 	DiskSizeGB            float64                    `json:"diskSizeGB,omitempty"`
 	BackupEnabled         bool                       `json:"backupEnabled"`
 	ProviderBackupEnabled bool                       `json:"providerBackupEnabled"`
