@@ -162,15 +162,15 @@ func resourceContainerUpdate(d *schema.ResourceData, meta interface{}) error {
 		requestUpdate = true
 	}
 	if d.HasChange("private_ip_mode") {
-		if d.Get("private_ip_mode").(bool) == false {
-			_, err := client.PrivateIPMode.Disable(d.Get("group").(string))
-			if err != nil {
-				return fmt.Errorf("Error disabling PrivateIPMode on MongoDB Container %s: %s", d.Id(), err)
-			}
-		} else if d.Get("private_ip_mode").(bool) == true {
+		if d.Get("private_ip_mode").(bool) {
 			_, err := client.PrivateIPMode.Enable(d.Get("group").(string))
 			if err != nil {
 				return fmt.Errorf("Error enabling PrivateIPMode on MongoDB Container %s: %s", d.Id(), err)
+			}
+		} else {
+			_, err := client.PrivateIPMode.Disable(d.Get("group").(string))
+			if err != nil {
+				return fmt.Errorf("Error disabling PrivateIPMode on MongoDB Container %s: %s", d.Id(), err)
 			}
 		}
 	}

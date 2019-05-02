@@ -64,10 +64,7 @@ func resourceAlertConfiguration() *schema.Resource {
 							Type:     schema.TypeInt,
 							Optional: true,
 							DiffSuppressFunc: func(key, oldValue, newValue string, d *schema.ResourceData) bool {
-								if oldValue == "2147483647" {
-									return true
-								}
-								return false
+								return oldValue == "2147483647"
 							},
 						},
 						"delay_min": {
