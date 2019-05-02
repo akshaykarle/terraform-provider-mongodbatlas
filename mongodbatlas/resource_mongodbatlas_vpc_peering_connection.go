@@ -23,73 +23,73 @@ func resourceVpcPeeringConnection() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"group": &schema.Schema{
+			"group": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"provider_name": &schema.Schema{
+			"provider_name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"route_table_cidr_block": &schema.Schema{
+			"route_table_cidr_block": {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"aws_account_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-			},
-			"vpc_id": &schema.Schema{
+			"aws_account_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"gcp_project_id": &schema.Schema{
+			"vpc_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"network_name": &schema.Schema{
+			"gcp_project_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"container_id": &schema.Schema{
+			"network_name": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+			},
+			"container_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"identifier": &schema.Schema{
+			"identifier": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"connection_id": &schema.Schema{
+			"connection_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"status_name": &schema.Schema{
+			"status_name": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"status": &schema.Schema{
+			"status": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"error_state_name": &schema.Schema{
+			"error_state_name": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"error_message": &schema.Schema{
+			"error_message": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,

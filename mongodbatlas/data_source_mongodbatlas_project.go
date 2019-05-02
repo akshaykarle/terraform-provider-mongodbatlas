@@ -12,19 +12,19 @@ func dataSourceProject() *schema.Resource {
 		Read: dataSourceProjectRead,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"org_id": &schema.Schema{
+			"org_id": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"created": &schema.Schema{
+			"created": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"cluster_count": &schema.Schema{
+			"cluster_count": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},

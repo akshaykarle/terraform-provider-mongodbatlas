@@ -29,111 +29,111 @@ func resourceCluster() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"group": &schema.Schema{
+			"group": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"mongodb_major_version": &schema.Schema{
+			"mongodb_major_version": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"backup": &schema.Schema{
+			"backup": {
 				Type:     schema.TypeBool,
 				Required: true,
 			},
-			"provider_backup": &schema.Schema{
+			"provider_backup": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
-			"size": &schema.Schema{
+			"size": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: false,
 			},
-			"provider_name": &schema.Schema{
+			"provider_name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"backing_provider": &schema.Schema{
+			"backing_provider": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"region": &schema.Schema{
+			"region": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: false,
 			},
-			"disk_size_gb": &schema.Schema{
+			"disk_size_gb": {
 				Type:     schema.TypeFloat,
 				Optional: true,
 				Computed: true,
 			},
-			"replication_factor": &schema.Schema{
+			"replication_factor": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  3,
 			},
-			"num_shards": &schema.Schema{
+			"num_shards": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Default:  1,
 			},
-			"paused": &schema.Schema{
+			"paused": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  false,
 			},
-			"disk_gb_enabled": &schema.Schema{
+			"disk_gb_enabled": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
 			},
-			"identifier": &schema.Schema{
+			"identifier": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"state": &schema.Schema{
+			"state": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"mongodb_version": &schema.Schema{
+			"mongodb_version": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"mongo_uri": &schema.Schema{
+			"mongo_uri": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"mongo_uri_updated": &schema.Schema{
+			"mongo_uri_updated": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"mongo_uri_with_options": &schema.Schema{
+			"mongo_uri_with_options": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"srv_address": &schema.Schema{
+			"srv_address": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"replication_spec": &schema.Schema{
+			"replication_spec": {
 				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,

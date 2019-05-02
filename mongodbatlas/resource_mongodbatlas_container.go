@@ -21,52 +21,52 @@ func resourceContainer() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"group": &schema.Schema{
+			"group": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"atlas_cidr_block": &schema.Schema{
+			"atlas_cidr_block": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"provider_name": &schema.Schema{
+			"provider_name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"region": &schema.Schema{
+			"region": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 			},
-			"vpc_id": &schema.Schema{
+			"vpc_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"gcp_project_id": &schema.Schema{
+			"gcp_project_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"network_name": &schema.Schema{
+			"network_name": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"identifier": &schema.Schema{
+			"identifier": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"provisioned": &schema.Schema{
+			"provisioned": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
-			"private_ip_mode": &schema.Schema{
+			"private_ip_mode": {
 				Type:     schema.TypeBool,
 				Optional: true,
 			},

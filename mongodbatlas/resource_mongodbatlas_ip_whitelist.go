@@ -25,26 +25,26 @@ func resourceIPWhitelist() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"group": &schema.Schema{
+			"group": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"cidr_block": &schema.Schema{
+			"cidr_block": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Computed:      true,
 				ForceNew:      true,
 				ConflictsWith: []string{"ip_address"},
 			},
-			"ip_address": &schema.Schema{
+			"ip_address": {
 				Type:          schema.TypeString,
 				Optional:      true,
 				Computed:      true,
 				ForceNew:      true,
 				ConflictsWith: []string{"cidr_block"},
 			},
-			"comment": &schema.Schema{
+			"comment": {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ValidateFunc: validation.StringLenBetween(0, 80),
@@ -67,7 +67,7 @@ func resourceIPWhitelistCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	params := []ma.Whitelist{
-		ma.Whitelist{
+		{
 			CidrBlock: cidrBlock,
 			GroupID:   d.Get("group").(string),
 			IPAddress: ip,

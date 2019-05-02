@@ -18,21 +18,21 @@ func resourceProject() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"org_id": &schema.Schema{
+			"org_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"created": &schema.Schema{
+			"created": {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			"cluster_count": &schema.Schema{
+			"cluster_count": {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},

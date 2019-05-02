@@ -21,26 +21,26 @@ func resourceDatabaseUser() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"group": &schema.Schema{
+			"group": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"username": &schema.Schema{
+			"username": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"password": &schema.Schema{
+			"password": {
 				Type:      schema.TypeString,
 				Optional:  true,
 				Sensitive: true,
 			},
-			"database": &schema.Schema{
+			"database": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"roles": &schema.Schema{
+			"roles": {
 				Type:     schema.TypeList,
 				Required: true,
 				Elem: &schema.Resource{

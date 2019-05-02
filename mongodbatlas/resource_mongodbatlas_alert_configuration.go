@@ -16,22 +16,22 @@ func resourceAlertConfiguration() *schema.Resource {
 		Delete: resourceAlertConfigurationDelete,
 
 		Schema: map[string]*schema.Schema{
-			"event_type_name": &schema.Schema{
+			"event_type_name": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: false,
 			},
-			"group": &schema.Schema{
+			"group": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"enabled": &schema.Schema{
+			"enabled": {
 				Type:     schema.TypeBool,
 				Required: true,
 				ForceNew: false,
 			},
-			"matchers": &schema.Schema{
+			"matchers": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
@@ -51,7 +51,7 @@ func resourceAlertConfiguration() *schema.Resource {
 					},
 				},
 			},
-			"notifications": &schema.Schema{
+			"notifications": {
 				Type:     schema.TypeList,
 				Required: true,
 				Elem: &schema.Resource{
@@ -145,7 +145,7 @@ func resourceAlertConfiguration() *schema.Resource {
 					},
 				},
 			},
-			"metric_threshold": &schema.Schema{
+			"metric_threshold": {
 				Type:     schema.TypeList,
 				Optional: true,
 				MaxItems: 1,
