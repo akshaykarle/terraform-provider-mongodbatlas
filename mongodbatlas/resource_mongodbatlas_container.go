@@ -208,20 +208,20 @@ func resourceContainerUpdate(d *schema.ResourceData, meta interface{}) error {
 }
 
 func resourceContainerDelete(d *schema.ResourceData, meta interface{}) error {
+	client := meta.(*ma.Client)
+	group := d.Get("group").(string)
 
-	// Adding this in as it can be used when the DELETE call is actually available.
+	_, err := client.Containers.Delete(group, d.Id())
+	if err != nil {
+		return fmt.Errorf("Error deleting MongoDB Container %s: %s", d.Id(), err)
+	}
 
-	// client := meta.(*ma.Client)
-
-	// _, err := client.Containers.Delete(d.Get("group").(string), d.Id())
-	// if err != nil {
-	// 	return fmt.Errorf("Error deleting MongoDB Container %s: %s", d.Id(), err)
-	// }
-
-	// _, err = client.PrivateIPMode.Disable(d.Get("group").(string))
-	// if err != nil {
-	// 	return fmt.Errorf("Error deleting MongoDB Container %s: %s", d.Id(), err)
-	// }
+	if d.Get("private_ip_mode").(bool) {
+		_, err = client.PrivateIPMode.Disable(group)
+		if err != nil {
+			return fmt.Errorf("Error enabling PrivateIPMode on MongoDB Container %s: %s", d.Id(), err)
+		}
+	}
 
 	return nil
 }

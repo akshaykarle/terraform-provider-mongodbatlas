@@ -18,8 +18,9 @@ func TestAccMongodbatlasContainer_basic(t *testing.T) {
 	resourceName := "mongodbatlas_container.test"
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testAccPreCheck(t) },
-		Providers: testAccProviders,
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckMongodbatlasContainerDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccMongodbatlasContainerCidr(projectName, cidrBlock),
@@ -69,6 +70,30 @@ func testAccCheckMongodbatlasContainerExists(n string, res *ma.Container) resour
 		*res = *c
 		return nil
 	}
+}
+
+func testAccCheckMongodbatlasContainerDestroy(s *terraform.State) error {
+	client := testAccProvider.Meta().(*ma.Client)
+	for _, rs := range s.RootModule().Resources {
+		if rs.Type != "mongodbatlas_container" {
+			continue
+		}
+
+		containers, _, err := client.Containers.List(rs.Primary.Attributes["group"], rs.Primary.Attributes["provider_name"])
+
+		if err == nil {
+			if len(containers) != 0 {
+				return fmt.Errorf("Container %q still exists", rs.Primary.ID)
+			}
+		}
+
+		// Verify the error
+		if err != nil {
+			return fmt.Errorf("Error listing MongoDB Containers: %s", err)
+		}
+	}
+
+	return nil
 }
 
 func testAccMongodbatlasContainerCidr(projectName, cidrBlock string) string {
