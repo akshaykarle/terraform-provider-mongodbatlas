@@ -249,27 +249,69 @@ func resourceClusterRead(d *schema.ResourceData, meta interface{}) error {
 		log.Printf("[WARN] Error setting replication specs set for (%s): %s", d.Get("name"), err)
 	}
 
-	d.Set("name", c.Name)
-	d.Set("group", c.GroupID)
-	d.Set("mongodb_major_version", c.MongoDBMajorVersion)
-	d.Set("backup", c.BackupEnabled)
-	d.Set("provider_backup", c.ProviderBackupEnabled)
-	d.Set("size", c.ProviderSettings.InstanceSizeName)
-	d.Set("provider_name", c.ProviderSettings.ProviderName)
-	d.Set("backing_provider", c.ProviderSettings.BackingProviderName)
-	d.Set("region", c.ProviderSettings.RegionName)
-	d.Set("disk_size_gb", c.DiskSizeGB)
-	d.Set("disk_gb_enabled", c.AutoScaling.DiskGBEnabled)
-	d.Set("replication_factor", c.ReplicationFactor)
-	d.Set("identifier", c.ID)
-	d.Set("state", c.StateName)
-	d.Set("num_shards", c.NumShards)
-	d.Set("paused", c.Paused)
-	d.Set("mongodb_version", c.MongoDBVersion)
-	d.Set("mongo_uri", c.MongoURI)
-	d.Set("mongo_uri_updated", c.MongoURIUpdated)
-	d.Set("mongo_uri_with_options", c.MongoURIWithOptions)
-	d.Set("srv_address", c.SrvAddress)
+	if err := d.Set("name", c.Name); err != nil {
+		log.Printf("[WARN] Error setting name for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("group", c.GroupID); err != nil {
+		log.Printf("[WARN] Error setting group for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("mongodb_major_version", c.MongoDBMajorVersion); err != nil {
+		log.Printf("[WARN] Error setting mongodb_major_version for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("backup", c.BackupEnabled); err != nil {
+		log.Printf("[WARN] Error setting backup for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("provider_backup", c.ProviderBackupEnabled); err != nil {
+		log.Printf("[WARN] Error setting provider_backup for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("size", c.ProviderSettings.InstanceSizeName); err != nil {
+		log.Printf("[WARN] Error setting size for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("provider_name", c.ProviderSettings.ProviderName); err != nil {
+		log.Printf("[WARN] Error setting provider_name for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("backing_provider", c.ProviderSettings.BackingProviderName); err != nil {
+		log.Printf("[WARN] Error setting backing_provider for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("region", c.ProviderSettings.RegionName); err != nil {
+		log.Printf("[WARN] Error setting region for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("disk_size_gb", c.DiskSizeGB); err != nil {
+		log.Printf("[WARN] Error setting disk_size_gb for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("disk_gb_enabled", c.AutoScaling.DiskGBEnabled); err != nil {
+		log.Printf("[WARN] Error setting disk_gb_enabled for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("replication_factor", c.ReplicationFactor); err != nil {
+		log.Printf("[WARN] Error setting replication_factor for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("identifier", c.ID); err != nil {
+		log.Printf("[WARN] Error setting identifier for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("state", c.StateName); err != nil {
+		log.Printf("[WARN] Error setting state for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("num_shards", c.NumShards); err != nil {
+		log.Printf("[WARN] Error setting num_shards for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("paused", c.Paused); err != nil {
+		log.Printf("[WARN] Error setting paused for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("mongodb_version", c.MongoDBVersion); err != nil {
+		log.Printf("[WARN] Error setting mongodb_version for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("mongo_uri", c.MongoURI); err != nil {
+		log.Printf("[WARN] Error setting mongo_uri for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("mongo_uri_updated", c.MongoURIUpdated); err != nil {
+		log.Printf("[WARN] Error setting mongo_uri_updated for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("mongo_uri_with_options", c.MongoURIWithOptions); err != nil {
+		log.Printf("[WARN] Error setting mongo_uri_with_options for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("srv_address", c.SrvAddress); err != nil {
+		log.Printf("[WARN] Error setting srv_address for (%s): %s", d.Get("name"), err)
+	}
 
 	return nil
 }
@@ -405,8 +447,12 @@ func resourceClusterImportState(d *schema.ResourceData, meta interface{}) ([]*sc
 	}
 
 	d.SetId(c.ID)
-	d.Set("name", c.Name)
-	d.Set("group", c.GroupID)
+	if err := d.Set("name", c.Name); err != nil {
+		log.Printf("[WARN] Error setting name for (%s): %s", d.Get("name"), err)
+	}
+	if err := d.Set("group", c.GroupID); err != nil {
+		log.Printf("[WARN] Error setting group for (%s): %s", d.Get("name"), err)
+	}
 
 	return []*schema.ResourceData{d}, nil
 }

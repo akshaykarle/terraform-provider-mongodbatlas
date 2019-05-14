@@ -79,18 +79,34 @@ func dataSourceContainerRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.SetId(c.ID)
-	d.Set("atlas_cidr_block", c.AtlasCidrBlock)
-	d.Set("provider_name", c.ProviderName)
-	d.Set("identifier", c.ID)
-	d.Set("provisioned", c.Provisioned)
+	if err := d.Set("atlas_cidr_block", c.AtlasCidrBlock); err != nil {
+		return fmt.Errorf("error setting atlas_cidr_block for resource %s: %s", d.Id(), err)
+	}
+	if err := d.Set("provider_name", c.ProviderName); err != nil {
+		return fmt.Errorf("error setting provider_name for resource %s: %s", d.Id(), err)
+	}
+	if err := d.Set("identifier", c.ID); err != nil {
+		return fmt.Errorf("error setting identifier for resource %s: %s", d.Id(), err)
+	}
+	if err := d.Set("provisioned", c.Provisioned); err != nil {
+		return fmt.Errorf("error setting provisioned for resource %s: %s", d.Id(), err)
+	}
 
 	if d.Get("provider_name").(string) == "AWS" {
-		d.Set("region", c.RegionName)
-		d.Set("vpc_id", c.VpcID)
+		if err := d.Set("region", c.RegionName); err != nil {
+			return fmt.Errorf("error setting region for resource %s: %s", d.Id(), err)
+		}
+		if err := d.Set("vpc_id", c.VpcID); err != nil {
+			return fmt.Errorf("error setting vpc_id for resource %s: %s", d.Id(), err)
+		}
 	}
 	if d.Get("provider_name").(string) == "GCP" {
-		d.Set("gcp_project_id", c.GcpProjectID)
-		d.Set("network_name", c.NetworkName)
+		if err := d.Set("gcp_project_id", c.GcpProjectID); err != nil {
+			return fmt.Errorf("error setting gcp_project_id for resource %s: %s", d.Id(), err)
+		}
+		if err := d.Set("network_name", c.NetworkName); err != nil {
+			return fmt.Errorf("error setting network_name for resource %s: %s", d.Id(), err)
+		}
 	}
 
 	return nil

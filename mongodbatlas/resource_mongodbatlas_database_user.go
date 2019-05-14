@@ -93,8 +93,12 @@ func resourceDatabaseUserRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error reading MongoDB DatabaseUser %s (%s): %s", d.Id(), d.Get("group").(string), err)
 	}
 
-	d.Set("username", u.Username)
-	d.Set("database", u.DatabaseName)
+	if err := d.Set("username", u.Username); err != nil {
+		log.Printf("[WARN] Error setting username for (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("database", u.DatabaseName); err != nil {
+		log.Printf("[WARN] Error setting database for (%s): %s", d.Id(), err)
+	}
 	rolesMap := make([]map[string]interface{}, len(u.Roles))
 	for i, r := range u.Roles {
 		rolesMap[i] = map[string]interface{}{
@@ -103,7 +107,9 @@ func resourceDatabaseUserRead(d *schema.ResourceData, meta interface{}) error {
 			"collection": r.CollectionName,
 		}
 	}
-	d.Set("roles", rolesMap)
+	if err := d.Set("roles", rolesMap); err != nil {
+		log.Printf("[WARN] Error setting roles for (%s): %s", d.Id(), err)
+	}
 
 	return nil
 }
@@ -164,7 +170,9 @@ func resourceDatabaseUserImportState(d *schema.ResourceData, meta interface{}) (
 	}
 
 	d.SetId(u.Username)
-	d.Set("group", u.GroupID)
+	if err := d.Set("group", u.GroupID); err != nil {
+		log.Printf("[WARN] Error setting group for (%s): %s", d.Id(), err)
+	}
 
 	return []*schema.ResourceData{d}, nil
 }

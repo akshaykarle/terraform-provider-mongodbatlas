@@ -41,10 +41,18 @@ func dataSourceProjectRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.SetId(p.ID)
-	d.Set("org_id", p.OrgID)
-	d.Set("name", p.Name)
-	d.Set("created", p.Created)
-	d.Set("cluster_count", p.ClusterCount)
+	if err := d.Set("org_id", p.OrgID); err != nil {
+		return fmt.Errorf("error setting org_id for resource %s: %s", d.Id(), err)
+	}
+	if err := d.Set("name", p.Name); err != nil {
+		return fmt.Errorf("error setting name for resource %s: %s", d.Id(), err)
+	}
+	if err := d.Set("created", p.Created); err != nil {
+		return fmt.Errorf("error setting created for resource %s: %s", d.Id(), err)
+	}
+	if err := d.Set("cluster_count", p.ClusterCount); err != nil {
+		return fmt.Errorf("error setting cluster_count for resource %s: %s", d.Id(), err)
+	}
 
 	return nil
 }

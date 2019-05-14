@@ -308,9 +308,15 @@ func resourceDataFromAlertConfiguration(alertConfiguration *ma.AlertConfiguratio
 		log.Printf("[WARN] Error setting metric threshold for (%s): %s", d.Id(), err)
 	}
 
-	d.Set("event_type_name", alertConfiguration.EventTypeName)
-	d.Set("enabled", alertConfiguration.Enabled)
-	d.Set("group", alertConfiguration.GroupID)
+	if err := d.Set("event_type_name", alertConfiguration.EventTypeName); err != nil {
+		log.Printf("[WARN] Error setting event_type_name for (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("enabled", alertConfiguration.Enabled); err != nil {
+		log.Printf("[WARN] Error setting enabled for (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("group", alertConfiguration.GroupID); err != nil {
+		log.Printf("[WARN] Error setting group for (%s): %s", d.Id(), err)
+	}
 }
 
 func readMetricThresholdFromSchema(thresholdMap map[string]interface{}) (threshold ma.MetricThreshold) {

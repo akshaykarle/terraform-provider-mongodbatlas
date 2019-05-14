@@ -116,17 +116,34 @@ func resourceContainerRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Error reading MongoDB Container %s: %s", d.Id(), err)
 	}
 
-	d.Set("atlas_cidr_block", c.AtlasCidrBlock)
-	d.Set("provider_name", c.ProviderName)
-	d.Set("identifier", c.ID)
-	d.Set("provisioned", c.Provisioned)
+	if err := d.Set("atlas_cidr_block", c.AtlasCidrBlock); err != nil {
+		log.Printf("[WARN] Error setting atlas_cidr_block for (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("provider_name", c.ProviderName); err != nil {
+		log.Printf("[WARN] Error setting provider_name for (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("identifier", c.ID); err != nil {
+		log.Printf("[WARN] Error setting identifier for (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("provisioned", c.Provisioned); err != nil {
+		log.Printf("[WARN] Error setting provisioned for (%s): %s", d.Id(), err)
+	}
 
-	if c.ProviderName == "GCP" {
-		d.Set("gcp_project_id", c.GcpProjectID)
-		d.Set("network_name", c.NetworkName)
-	} else if c.ProviderName == "AWS" {
-		d.Set("vpc_id", c.VpcID)
-		d.Set("region", c.RegionName)
+	if d.Get("provider_name").(string) == "AWS" {
+		if err := d.Set("region", c.RegionName); err != nil {
+			log.Printf("[WARN] Error setting region for (%s): %s", d.Id(), err)
+		}
+		if err := d.Set("vpc_id", c.VpcID); err != nil {
+			log.Printf("[WARN] Error setting vpc_id for (%s): %s", d.Id(), err)
+		}
+	}
+	if d.Get("provider_name").(string) == "GCP" {
+		if err := d.Set("gcp_project_id", c.GcpProjectID); err != nil {
+			log.Printf("[WARN] Error setting gcp_project_id for (%s): %s", d.Id(), err)
+		}
+		if err := d.Set("network_name", c.NetworkName); err != nil {
+			log.Printf("[WARN] Error setting network_name for (%s): %s", d.Id(), err)
+		}
 	}
 
 	return nil
@@ -218,19 +235,34 @@ func resourceContainerImportState(d *schema.ResourceData, meta interface{}) ([]*
 	}
 
 	d.SetId(c.ID)
-	d.Set("group", gid)
-	d.Set("atlas_cidr_block", c.AtlasCidrBlock)
-	d.Set("provider_name", c.ProviderName)
-	d.Set("identifier", c.ID)
-	d.Set("provisioned", c.Provisioned)
+	if err := d.Set("atlas_cidr_block", c.AtlasCidrBlock); err != nil {
+		log.Printf("[WARN] Error setting atlas_cidr_block for (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("provider_name", c.ProviderName); err != nil {
+		log.Printf("[WARN] Error setting provider_name for (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("identifier", c.ID); err != nil {
+		log.Printf("[WARN] Error setting identifier for (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("provisioned", c.Provisioned); err != nil {
+		log.Printf("[WARN] Error setting provisioned for (%s): %s", d.Id(), err)
+	}
 
 	if d.Get("provider_name").(string) == "AWS" {
-		d.Set("region", c.RegionName)
-		d.Set("vpc_id", c.VpcID)
+		if err := d.Set("region", c.RegionName); err != nil {
+			log.Printf("[WARN] Error setting region for (%s): %s", d.Id(), err)
+		}
+		if err := d.Set("vpc_id", c.VpcID); err != nil {
+			log.Printf("[WARN] Error setting vpc_id for (%s): %s", d.Id(), err)
+		}
 	}
 	if d.Get("provider_name").(string) == "GCP" {
-		d.Set("gcp_project_id", c.GcpProjectID)
-		d.Set("network_name", c.NetworkName)
+		if err := d.Set("gcp_project_id", c.GcpProjectID); err != nil {
+			log.Printf("[WARN] Error setting gcp_project_id for (%s): %s", d.Id(), err)
+		}
+		if err := d.Set("network_name", c.NetworkName); err != nil {
+			log.Printf("[WARN] Error setting network_name for (%s): %s", d.Id(), err)
+		}
 	}
 
 	return []*schema.ResourceData{d}, nil

@@ -152,23 +152,46 @@ func resourceVpcPeeringConnectionRead(d *schema.ResourceData, meta interface{}) 
 	}
 
 	if d.Get("provider_name").(string) == "AWS" {
-		d.Set("route_table_cidr_block", p.RouteTableCidrBlock)
-		d.Set("vpc_id", p.VpcID)
-		d.Set("aws_account_id", p.AwsAccountID)
-		d.Set("status_name", p.StatusName)
-		d.Set("error_state_name", p.ErrorStateName)
-		d.Set("connection_id", p.ConnectionID)
+		if err := d.Set("route_table_cidr_block", p.RouteTableCidrBlock); err != nil {
+			log.Printf("[WARN] Error settingroute_table_cidr_block for (%s): %s", d.Id(), err)
+		}
+		if err := d.Set("vpc_id", p.VpcID); err != nil {
+			log.Printf("[WARN] Error setting vpc_id for (%s): %s", d.Id(), err)
+		}
+		if err := d.Set("aws_account_id", p.AwsAccountID); err != nil {
+			log.Printf("[WARN] Error setting aws_account_id for (%s): %s", d.Id(), err)
+		}
+		if err := d.Set("status_name", p.StatusName); err != nil {
+			log.Printf("[WARN] Error setting status_name for (%s): %s", d.Id(), err)
+		}
+		if err := d.Set("error_state_name", p.ErrorStateName); err != nil {
+			log.Printf("[WARN] Error setting error_state_name for (%s): %s", d.Id(), err)
+		}
+		if err := d.Set("connection_id", p.ConnectionID); err != nil {
+			log.Printf("[WARN] Error setting connection_id for (%s): %s", d.Id(), err)
+		}
 	}
 	if d.Get("provider_name").(string) == "GCP" {
-		log.Println("[INFO]  Provider is GCP")
-		d.Set("network_name", p.NetworkName)
-		d.Set("gcp_project_id", p.GcpProjectID)
-		d.Set("status", p.Status)
-		d.Set("error_message", p.ErrorMessage)
+		if err := d.Set("network_name", p.NetworkName); err != nil {
+			log.Printf("[WARN] Error setting network_name for (%s): %s", d.Id(), err)
+		}
+		if err := d.Set("gcp_project_id", p.GcpProjectID); err != nil {
+			log.Printf("[WARN] Error setting gcp_project_id for (%s): %s", d.Id(), err)
+		}
+		if err := d.Set("status", p.Status); err != nil {
+			log.Printf("[WARN] Error setting status for (%s): %s", d.Id(), err)
+		}
+		if err := d.Set("error_message", p.ErrorMessage); err != nil {
+			log.Printf("[WARN] Error setting error_message for (%s): %s", d.Id(), err)
+		}
 	}
 
-	d.Set("identifier", p.ID)
-	d.Set("container_id", p.ContainerID)
+	if err := d.Set("identifier", p.ID); err != nil {
+		log.Printf("[WARN] Error setting identifier for (%s): %s", d.Id(), err)
+	}
+	if err := d.Set("container_id", p.ContainerID); err != nil {
+		log.Printf("[WARN] Error setting container_id for (%s): %s", d.Id(), err)
+	}
 
 	return nil
 }
@@ -278,7 +301,9 @@ func resourceVpcPeeringConnectionImportState(d *schema.ResourceData, meta interf
 	}
 
 	d.SetId(peer.ID)
-	d.Set("group", gid)
+	if err := d.Set("group", gid); err != nil {
+		log.Printf("[WARN] Error setting group for (%s): %s", d.Id(), err)
+	}
 
 	return []*schema.ResourceData{d}, nil
 
