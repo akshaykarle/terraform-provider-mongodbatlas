@@ -25,6 +25,7 @@ resource "mongodbatlas_container" "test" {
 
 # Create a Cluster
 resource "mongodbatlas_cluster" "test" {
+  depends_on = ["mongodbatlas_container.test"]
   name = "${var.cluster_name}"
   group = "${mongodbatlas_project.test.id}"
   mongodb_major_version = "3.6"
