@@ -82,15 +82,13 @@ func resourceContainerCreate(d *schema.ResourceData, meta interface{}) error {
 		ProviderName:   d.Get("provider_name").(string),
 	}
 
-	// Supply needfuls when GCP
+	if params.ProviderName == "AWS" {
+		params.RegionName = d.Get("region").(string)
+	}
+
 	if params.ProviderName == "GCP" {
 		params.GcpProjectID = d.Get("gcp_project_id").(string)
 		params.NetworkName = d.Get("network_name").(string)
-	}
-
-	if params.ProviderName == "AWS" {
-		params.RegionName = d.Get("region").(string)
-		params.AtlasCidrBlock = d.Get("atlas_cidr_block").(string)
 	}
 
 	container, _, err := client.Containers.Create(d.Get("group").(string), &params)
