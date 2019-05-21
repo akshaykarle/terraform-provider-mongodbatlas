@@ -88,6 +88,11 @@ func resourceContainerCreate(d *schema.ResourceData, meta interface{}) error {
 		params.NetworkName = d.Get("network_name").(string)
 	}
 
+	if params.ProviderName == "AWS" {
+		params.RegionName = d.Get("region").(string)
+		params.AtlasCidrBlock = d.Get("atlas_cidr_block").(string)
+	}
+
 	container, _, err := client.Containers.Create(d.Get("group").(string), &params)
 
 	if err != nil {
