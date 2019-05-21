@@ -67,7 +67,7 @@ data "google_compute_network" "default" {
 
 data "mongodbatlas_container" "container" {
     group = "${mongodbatlas_project.project.id}"
-    container_id = "${mongodbatlas_container.container.id}"
+    identifier = "${mongodbatlas_container.container.id}"
 
     depends_on = ["mongodbatlas_vpc_peering_connection.gcp_peer"]
 }
