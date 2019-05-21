@@ -12,8 +12,6 @@ description: |-
 
 ~> **NOTE:** Only one Container can exist within a Project for each region. The provider allows you to define multiple container resources within the same project and region but this may lead to constant updates of the resources.
 
--> **NOTE:** The provider does not currently support deleting Containers due to a limitation in MongoDB Atlas's API.
-
 -> **NOTE:** Groups and projects are synonymous terms. `group` arguments on resources are the project ID.
 
 ## Example Usage
