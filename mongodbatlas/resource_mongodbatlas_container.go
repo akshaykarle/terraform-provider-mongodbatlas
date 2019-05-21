@@ -102,7 +102,7 @@ func resourceContainerCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[INFO] MongoDB Container ID: %s", d.Id())
 
 	if d.Get("private_ip_mode").(bool) {
-		log.Printf("Attempting to enable PrivateIPMode")
+		log.Printf("[INFO] Attempting to enable PrivateIPMode")
 		_, err := client.PrivateIPMode.Enable(d.Get("group").(string))
 
 		if err != nil {
@@ -198,6 +198,7 @@ func resourceContainerUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if requestUpdate {
+		c.ID = ""
 		_, _, err := client.Containers.Update(d.Get("group").(string), d.Id(), c)
 		if err != nil {
 			return fmt.Errorf("Error reading MongoDB Container %s: %s", d.Id(), err)
