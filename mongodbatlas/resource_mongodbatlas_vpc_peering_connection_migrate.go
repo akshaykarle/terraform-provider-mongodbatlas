@@ -7,48 +7,48 @@ import (
 func resourceVpcPeeringConnectionResourceV0() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			"group": &schema.Schema{
+			"group": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"route_table_cidr_block": &schema.Schema{
+			"route_table_cidr_block": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"aws_account_id": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
-			},
-			"vpc_id": &schema.Schema{
+			"aws_account_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"container_id": &schema.Schema{
+			"vpc_id": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
-			"identifier": &schema.Schema{
+			"container_id": {
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
+			"identifier": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"connection_id": &schema.Schema{
+			"connection_id": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
-			"status_name": &schema.Schema{
+			"status_name": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
-			"error_state_name": &schema.Schema{
+			"error_state_name": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,

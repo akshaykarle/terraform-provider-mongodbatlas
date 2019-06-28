@@ -312,9 +312,13 @@ func resourceVpcPeeringConnectionImportState(d *schema.ResourceData, meta interf
 	// https://docs.atlas.mongodb.com/reference/api/vpc-get-connection/#example-response
 	// Atlas API does not return ProviderName, so we have to guess it from other parameters
 	if peer.AwsAccountID != "" {
-		d.Set("provider_name", "AWS")
+		if err := d.Set("provider_name", "AWS"); err != nil {
+			return nil, fmt.Errorf("Error setting provider name: %v", err)
+		}
 	} else if peer.GcpProjectID != "" {
-		d.Set("provider_name", "GCP")
+		if err := d.Set("provider_name", "GCP"); err != nil {
+			return nil, fmt.Errorf("Error setting provider name: %v", err)
+		}
 	}
 
 	d.SetId(peer.ID)
