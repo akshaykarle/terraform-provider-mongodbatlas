@@ -22,6 +22,15 @@ func resourceVpcPeeringConnection() *schema.Resource {
 			State: resourceVpcPeeringConnectionImportState,
 		},
 
+		SchemaVersion: 1,
+		StateUpgraders: []schema.StateUpgrader{
+			{
+				Type:    resourceVpcPeeringConnectionResourceV0().CoreConfigSchema().ImpliedType(),
+				Upgrade: resourceVpcPeeringConnectionStateUpgradeV0,
+				Version: 0,
+			},
+		},
+
 		Schema: map[string]*schema.Schema{
 			"group": {
 				Type:     schema.TypeString,
