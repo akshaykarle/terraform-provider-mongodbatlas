@@ -42,6 +42,7 @@ resource "mongodbatlas_container" "container" {
 
 resource "mongodbatlas_vpc_peering_connection" "peering" {
   group                  = "${data.mongodbatlas_project.project.id}"
+  provider_name          = "AWS"
   aws_account_id         = "111111111111"
   vpc_id                 = "vpc-xxxxxxxxxxxxxxxxx"
   route_table_cidr_block = "10.1.0.0/16"
@@ -125,6 +126,9 @@ resource "google_compute_network_peering" "atlas_peer" {
 ~> **NOTE:** The Atlas VPC container and the `vpc_id` peer VPC *must* share an AWS region.
 
 * `group` - (Required) The ID of the project in which to create the VPC peering connection.
+* `provider_name` - (Required) Name of the cloud provider. Valid options are:
+  * `AWS`
+  * `GCP`
 * `route_table_cidr_block` ( _AWS_ ) - (Optional) The peer VPC CIDR block or subnet.
 * `vpc_id` ( _AWS_ ) - (Optional) - The ID of the peer VPC.
 * `gcp_project_id` ( _GCP_ ) - (Optional) - GCP project ID of the owner of the peer VPC.
@@ -160,5 +164,5 @@ In addition to all arguments above, the following attributes are exported:
 VPC Peering Connections can be imported using project ID and peering connection ID, in the format `PROJECTID-PEERINGID`, e.g.
 
 ```
-$ terraform import mongodbatlas_vpc_peering_connection.peering 1112222b3bf99403840e8934-pcx-xxxxxxxxxxxxxxxxx
+$ terraform import mongodbatlas_vpc_peering_connection.peering 1112222b3bf99403840e8934-1aa111a1a11a111aa1a1a111
 ```
