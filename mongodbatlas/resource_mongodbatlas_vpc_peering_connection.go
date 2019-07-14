@@ -22,6 +22,15 @@ func resourceVpcPeeringConnection() *schema.Resource {
 			State: resourceVpcPeeringConnectionImportState,
 		},
 
+		SchemaVersion: 1,
+		StateUpgraders: []schema.StateUpgrader{
+			{
+				Type:    resourceVpcPeeringConnectionResourceV0().CoreConfigSchema().ImpliedType(),
+				Upgrade: resourceVpcPeeringConnectionStateUpgradeV0,
+				Version: 0,
+			},
+		},
+
 		Schema: map[string]*schema.Schema{
 			"group": {
 				Type:     schema.TypeString,
@@ -298,6 +307,18 @@ func resourceVpcPeeringConnectionImportState(d *schema.ResourceData, meta interf
 	peer, err := getConnection(client, gid, connectionID)
 	if err != nil {
 		return nil, err
+	}
+
+	// https://docs.atlas.mongodb.com/reference/api/vpc-get-connection/#example-response
+	// Atlas API does not return ProviderName, so we have to guess it from other parameters
+	if peer.AwsAccountID != "" {
+		if err := d.Set("provider_name", "AWS"); err != nil {
+			return nil, fmt.Errorf("Error setting provider name: %v", err)
+		}
+	} else if peer.GcpProjectID != "" {
+		if err := d.Set("provider_name", "GCP"); err != nil {
+			return nil, fmt.Errorf("Error setting provider name: %v", err)
+		}
 	}
 
 	d.SetId(peer.ID)
