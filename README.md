@@ -6,6 +6,11 @@
 
 Terraform provider for [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
 
+### IMPORTANT NOTE - This provider is no longer under development.  
+Please use the official, verified Terraform MongoDB Atlas Provider:
+-[Documentation](https://www.terraform.io/docs/providers/mongodbatlas/)
+-[GitHub Repo](https://github.com/terraform-providers/terraform-provider-mongodbatlas/)
+
 ## Requirements
 -	[Terraform](https://www.terraform.io/downloads.html) 0.12.x
 -	[Go](https://golang.org/doc/install) 1.12 (to build the provider plugin)
